@@ -1,0 +1,18 @@
+html {
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #141517;
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+}
+
+#root {
+    padding: 2rem;
+    margin: auto;
+}

@@ -1,0 +1,120 @@
+@import "src/breeze-color";
+
+.panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 44px;
+  background: #edeeef;
+  padding: 0 15px;
+  line-height: 30px;
+  box-sizing: border-box;
+  z-index: 999;
+
+  > div {
+    line-height: 30px;
+  }
+}
+
+.window {
+  background: #eff0f1;
+  position: absolute;
+}
+
+.app-launcher {
+  height: 100%;
+  width: 40px;
+  position: relative;
+  padding: 0 4px;
+  cursor: pointer;
+  @extend .icon-wrapper;
+
+  .icon-app-launcher {
+    width: 30px;
+    height: 30px;
+    background: url(/public/icons/places/start-here-kde.svg) no-repeat center;
+  }
+}
+
+.icon-wrapper {
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: contain;
+}
+
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.task-manager {
+  list-style-type: none;
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  user-select: none;
+
+  li {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+    cursor: pointer;
+    &.active {
+      border-top: 3px solid #9D9DA3;
+      background: #bfbfc5;
+      box-sizing: border-box;
+      img {
+        margin-top: -3px;
+      }
+    }
+  }
+}
+
+.digital-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #232629;
+  background: #edeeef;
+  box-sizing: border-box;
+  cursor: default;
+  user-select: none;
+  span:first-child {
+    line-height: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    opacity: 1;
+  }
+  span {
+    font-size: 12px;
+    line-height: 10px;
+    opacity: 0.6;
+  }
+}
+
+.digital-clock-tooltip {
+  display: flex;
+  flex-direction: column;
+  span:first-child {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 30px;
+  }
+  span {
+    font-size: 14px;
+    line-height: 18px;
+  }
+}

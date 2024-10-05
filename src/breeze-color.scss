@@ -1,0 +1,304 @@
+/* from breeze-gtk breeze-light */
+
+/*
+widget text/foreground color */
+$theme_fg_color: #232629;
+/*
+text color for entries, views and content in general */
+$theme_text_color: #232629;
+/*
+widget base background color */
+$theme_bg_color: #eff0f1;
+/*
+text widgets and the like base background color */
+$theme_base_color: white;
+/*
+view hover decoration color*/
+$theme_view_hover_decoration_color: #3daee9;
+/*
+background color of hovering selected widgets*/
+$theme_hovering_selected_bg_color: #3daee9;
+/*
+base background color of selections */
+$theme_selected_bg_color: #3daee9;
+/*
+text/foreground color of selections */
+$theme_selected_fg_color: white;
+/*
+decoration color of views */
+$theme_view_active_decoration_color: #3daee9;
+/*
+base background color of insensitive selections */
+$insensitive_selected_bg_color: rgba(37, 164, 230, 0.35);
+/*
+base background color of insensitive widgets */
+$insensitive_bg_color: #d8dadd;
+/*
+text foreground color of insensitive widgets */
+$insensitive_fg_color: rgba(32, 35, 37, 0.35);
+/*
+insensitive text widgets and the like base background color */
+$insensitive_base_color: rgba(32, 35, 37, 0.35);
+/*
+insensitive text widgets and the like base foreground color */
+$insensitive_base_fg_color: #e8e8e8;
+/*
+insensitive selected text widgets and the like base background color */
+$insensitive_selected_fg_color: #e8e8e8;
+/*
+widget text/foreground color on backdrop windows */
+$theme_unfocused_fg_color: #232629;
+/*
+text color for entries, views and content in general on backdrop windows */
+$theme_unfocused_text_color: #232629;
+/*
+widget base background color on backdrop windows */
+$theme_unfocused_bg_color: #eff0f1;
+/*
+text widgets and the like base background color on backdrop windows */
+$theme_unfocused_base_color: white;
+/*
+base background color of selections on backdrop windows, alt */
+$theme_unfocused_selected_bg_color_alt: #3daee9;
+/*
+base background color of selections on backdrop windows */
+$theme_unfocused_selected_bg_color: rgba(61, 174, 233, 0.5);
+/*
+text/foreground color of selections on backdrop windows */
+$theme_unfocused_selected_fg_color: white;
+/*
+base background color of insensitive selections on backdrop windows */
+$insensitive_unfocused_selected_bg_color: rgba(37, 164, 230, 0.35);
+/*
+text foreground color of insensitive widgets on backdrop windows*/
+$insensitive_unfocused_fg_color: rgba(32, 35, 37, 0.35);
+/*
+backdground color of insensitive widgets on backdrop windows*/
+$insensitive_unfocused_bg_color: #d8dadd;
+/*
+text foreground color of insensitive selected widgets on backdrop windows*/
+$insensitive_unfocused_selected_fg_color: #e8e8e8;
+/*
+view text foreground color of insensitive widgets on backdrop windows */
+$theme_unfocused_view_text_color: rgba(32, 35, 37, 0.35);
+/*
+insensitive view background color on backdrop windows */
+$theme_unfocused_view_bg_color: #e8e8e8;
+/*
+widgets main borders color */
+$borders: #c6c8c9;
+/*
+widgets main borders color on backdrop windows */
+$unfocused_borders: #c6c8c9;
+/*
+widgets main borders color insensitive */
+$insensitive_borders: rgba(179, 182, 183, 0.35);
+/*
+widgets main borders color insensitive backdrop */
+$unfocused_insensitive_borders: rgba(179, 182, 183, 0.35);
+/*
+*
+* Button Colors
+*
+*/
+$theme_button_background_normal: #fcfcfc;
+$theme_button_decoration_hover:  #3daee9;
+$theme_button_decoration_focus:  #3daee9;
+$theme_button_foreground_normal: #232629;
+$theme_button_foreground_active: white;
+$theme_button_background_insensitive:        #e5e5e5;
+$theme_button_decoration_hover_insensitive:  rgba(37, 164, 230, 0.35);
+$theme_button_decoration_focus_insensitive:  rgba(37, 164, 230, 0.35);
+$theme_button_foreground_insensitive:        rgba(32, 35, 37, 0.35);
+$theme_button_foreground_active_insensitive: #e8e8e8;
+$theme_button_background_backdrop:        #fcfcfc;
+$theme_button_decoration_hover_backdrop:  #3daee9;
+$theme_button_decoration_focus_backdrop:  #3daee9;
+$theme_button_foreground_backdrop:        #232629;
+$theme_button_foreground_active_backdrop: white;
+$theme_button_background_backdrop_insensitive:        #e5e5e5;
+$theme_button_decoration_hover_backdrop_insensitive:  rgba(37, 164, 230, 0.35);
+$theme_button_decoration_focus_backdrop_insensitive:  rgba(37, 164, 230, 0.35);
+$theme_button_foreground_backdrop_insensitive:        rgba(32, 35, 37, 0.35);
+$theme_button_foreground_active_backdrop_insensitive: #e8e8e8;
+/*
+these are pretty self explicative */
+$warning_color: #f67400;
+$error_color:   #da4453;
+$success_color: #27ae60;
+$warning_color_backdrop: #f67400;
+$error_color_backdrop:   #da4453;
+$success_color_backdrop: #27ae60;
+$warning_color_insensitive: rgba(224, 105, 0, 0.35);
+$error_color_insensitive:   rgba(214, 46, 63, 0.35);
+$success_color_insensitive: rgba(35, 158, 87, 0.35);
+$warning_color_insensitive_backdrop: rgba(224, 105, 0, 0.35);
+$error_color_insensitive_backdrop:   rgba(214, 46, 63, 0.35);
+$success_color_insensitive_backdrop: rgba(35, 158, 87, 0.35);
+$link_color: #2980b9;
+$link_visited_color: #9b59b6;
+/*
+*
+* Titlebar Colors
+*
+*/
+$theme_titlebar_background:          #e3e5e7;
+$theme_titlebar_foreground:          #232629;
+$theme_titlebar_background_light:    #eff0f1;
+$theme_titlebar_foreground_backdrop: #707d8a;
+$theme_titlebar_background_backdrop: #eff0f1;
+$theme_titlebar_foreground_insensitive: rgba(32, 35, 37, 0.35);
+$theme_titlebar_foreground_insensitive_backdrop: rgba(102, 114, 125, 0.35);
+/*
+* Tooltips
+*/
+$tooltip_text: #232629;
+$tooltip_background: #f7f7f7;
+$tooltip_border: #cdcdce;
+/*
+* Misc
+*/
+$print_paper_backdrop:  white;
+$content_view_bg: white;
+
+
+// from plasma breeze-light.colors
+// ColorEffects: Disabled
+$color-effects-disabled-color: rgb(56, 56, 56);
+$color-effects-disabled-color-amount: 0;
+$color-effects-disabled-color-effect: 0;
+$color-effects-disabled-contrast-amount: 0.65;
+$color-effects-disabled-contrast-effect: 1;
+$color-effects-disabled-intensity-amount: 0.1;
+$color-effects-disabled-intensity-effect: 2;
+
+// ColorEffects: Inactive
+$color-effects-inactive-change-selection-color: true;
+$color-effects-inactive-color: rgb(112, 111, 110);
+$color-effects-inactive-color-amount: 0.025;
+$color-effects-inactive-color-effect: 2;
+$color-effects-inactive-contrast-amount: 0.1;
+$color-effects-inactive-contrast-effect: 2;
+$color-effects-inactive-enable: false;
+$color-effects-inactive-intensity-amount: 0;
+$color-effects-inactive-intensity-effect: 0;
+
+// Colors: Button
+$colors-button-background-alternate: rgb(163, 212, 250);
+$colors-button-background-normal: rgb(252, 252, 252);
+$colors-button-decoration-focus: rgb(61, 174, 233);
+$colors-button-decoration-hover: rgb(61, 174, 233);
+$colors-button-foreground-active: rgb(61, 174, 233);
+$colors-button-foreground-inactive: rgb(112, 125, 138);
+$colors-button-foreground-link: rgb(41, 128, 185);
+$colors-button-foreground-negative: rgb(218, 68, 83);
+$colors-button-foreground-neutral: rgb(246, 116, 0);
+$colors-button-foreground-normal: rgb(35, 38, 41);
+$colors-button-foreground-positive: rgb(39, 174, 96);
+$colors-button-foreground-visited: rgb(155, 89, 182);
+
+// Colors: Complementary
+$colors-complementary-background-alternate: rgb(27, 30, 32);
+$colors-complementary-background-normal: rgb(42, 46, 50);
+$colors-complementary-decoration-focus: rgb(61, 174, 233);
+$colors-complementary-decoration-hover: rgb(61, 174, 233);
+$colors-complementary-foreground-active: rgb(61, 174, 233);
+$colors-complementary-foreground-inactive: rgb(161, 169, 177);
+$colors-complementary-foreground-link: rgb(29, 153, 243);
+$colors-complementary-foreground-negative: rgb(218, 68, 83);
+$colors-complementary-foreground-neutral: rgb(246, 116, 0);
+$colors-complementary-foreground-normal: rgb(252, 252, 252);
+$colors-complementary-foreground-positive: rgb(39, 174, 96);
+$colors-complementary-foreground-visited: rgb(155, 89, 182);
+
+// Colors: Header
+$colors-header-background-alternate: rgb(239, 240, 241);
+$colors-header-background-normal: rgb(222, 224, 226);
+$colors-header-decoration-focus: rgb(61, 174, 233);
+$colors-header-decoration-hover: rgb(61, 174, 233);
+$colors-header-foreground-active: rgb(61, 174, 233);
+$colors-header-foreground-inactive: rgb(112, 125, 138);
+$colors-header-foreground-link: rgb(41, 128, 185);
+$colors-header-foreground-negative: rgb(218, 68, 83);
+$colors-header-foreground-neutral: rgb(246, 116, 0);
+$colors-header-foreground-normal: rgb(35, 38, 41);
+$colors-header-foreground-positive: rgb(39, 174, 96);
+$colors-header-foreground-visited: rgb(155, 89, 182);
+
+// Colors: Header Inactive
+$colors-header-inactive-background-alternate: rgb(227, 229, 231);
+$colors-header-inactive-background-normal: rgb(239, 240, 241);
+$colors-header-inactive-decoration-focus: rgb(61, 174, 233);
+$colors-header-inactive-decoration-hover: rgb(61, 174, 233);
+$colors-header-inactive-foreground-active: rgb(61, 174, 233);
+$colors-header-inactive-foreground-inactive: rgb(112, 125, 138);
+$colors-header-inactive-foreground-link: rgb(41, 128, 185);
+$colors-header-inactive-foreground-negative: rgb(218, 68, 83);
+$colors-header-inactive-foreground-neutral: rgb(246, 116, 0);
+$colors-header-inactive-foreground-normal: rgb(35, 38, 41);
+$colors-header-inactive-foreground-positive: rgb(39, 174, 96);
+$colors-header-inactive-foreground-visited: rgb(155, 89, 182);
+
+// Colors: Selection
+$colors-selection-background-alternate: rgb(163, 212, 250);
+$colors-selection-background-normal: rgb(61, 174, 233);
+$colors-selection-decoration-focus: rgb(61, 174, 233);
+$colors-selection-decoration-hover: rgb(61, 174, 233);
+$colors-selection-foreground-active: rgb(255, 255, 255);
+$colors-selection-foreground-inactive: rgb(112, 125, 138);
+$colors-selection-foreground-link: rgb(253, 188, 75);
+$colors-selection-foreground-negative: rgb(176, 55, 69);
+$colors-selection-foreground-neutral: rgb(198, 92, 0);
+$colors-selection-foreground-normal: rgb(255, 255, 255);
+$colors-selection-foreground-positive: rgb(23, 104, 57);
+$colors-selection-foreground-visited: rgb(155, 89, 182);
+
+// Colors: Tooltip
+$colors-tooltip-background-alternate: rgb(239, 240, 241);
+$colors-tooltip-background-normal: rgb(247, 247, 247);
+$colors-tooltip-decoration-focus: rgb(61, 174, 233);
+$colors-tooltip-decoration-hover: rgb(61, 174, 233);
+$colors-tooltip-foreground-active: rgb(61, 174, 233);
+$colors-tooltip-foreground-inactive: rgb(112, 125, 138);
+$colors-tooltip-foreground-link: rgb(41, 128, 185);
+$colors-tooltip-foreground-negative: rgb(218, 68, 83);
+$colors-tooltip-foreground-neutral: rgb(246, 116, 0);
+$colors-tooltip-foreground-normal: rgb(35, 38, 41);
+$colors-tooltip-foreground-positive: rgb(39, 174, 96);
+$colors-tooltip-foreground-visited: rgb(155, 89, 182);
+
+// Colors: View
+$colors-view-background-alternate: rgb(247, 247, 247);
+$colors-view-background-normal: rgb(255, 255, 255);
+$colors-view-decoration-focus: rgb(61, 174, 233);
+$colors-view-decoration-hover: rgb(61, 174, 233);
+$colors-view-foreground-active: rgb(61, 174, 233);
+$colors-view-foreground-inactive: rgb(112, 125, 138);
+$colors-view-foreground-link: rgb(41, 128, 185);
+$colors-view-foreground-negative: rgb(218, 68, 83);
+$colors-view-foreground-neutral: rgb(246, 116, 0);
+$colors-view-foreground-normal: rgb(35, 38, 41);
+$colors-view-foreground-positive: rgb(39, 174, 96);
+$colors-view-foreground-visited: rgb(155, 89, 182);
+
+// Colors: Window
+$colors-window-background-alternate: rgb(227, 229, 231);
+$colors-window-background-normal: rgb(239, 240, 241);
+$colors-window-decoration-focus: rgb(61, 174, 233);
+$colors-window-decoration-hover: rgb(61, 174, 233);
+$colors-window-foreground-active: rgb(61, 174, 233);
+$colors-window-foreground-inactive: rgb(112, 125, 138);
+$colors-window-foreground-link: rgb(41, 128, 185);
+$colors-window-foreground-negative: rgb(218, 68, 83);
+$colors-window-foreground-neutral: rgb(246, 116, 0);
+$colors-window-foreground-normal: rgb(35, 38, 41);
+$colors-window-foreground-positive: rgb(39, 174, 96);
+$colors-window-foreground-visited: rgb(155, 89, 182);
+
+// WM (Window Manager)
+$wm-active-background: rgb(227, 229, 231);
+$wm-active-blend: rgb(227, 229, 231);
+$wm-active-foreground: rgb(35, 38, 41);
+$wm-inactive-background: rgb(239, 240, 241);
+$wm-inactive-blend: rgb(239, 240, 241);
+$wm-inactive-foreground: rgb(112, 125, 138);
