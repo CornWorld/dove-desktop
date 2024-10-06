@@ -102,14 +102,16 @@ const DigitalClock = () => {
         return () => {
             setClock(dayjs().format(str));
             if(!refresh) return;
-            interval = setInterval(() => {
+            const interval = setInterval(() => {
                 setClock(dayjs().format(str));
             }, 100);
             return () => { clearInterval(interval) };
         };
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(genEffect('HH:mm:ss\nYYYY/MM/DD', setClock, true), []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(genEffect('dddd\n[UTC]Z HH:mm:ss\nYYYY/MM/DD', setTooltipClock, tooltipVisible), [tooltipVisible]);
 
     return (

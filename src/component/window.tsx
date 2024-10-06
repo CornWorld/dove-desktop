@@ -13,6 +13,7 @@ interface WindowState {
     width: number;
     x: number;
     y: number;
+    z: number;
     setPos: (x: number, y: number) => void;
     drag: DraggableState;
 }
@@ -24,7 +25,7 @@ const windowStore = create<WindowState>((set) => ({
     widgetId: 'widget1',
     active: true,
     height: 675, width: 931,
-    x: 80, y: 45,
+    x: 80, y: 45, z: 3,
     setPos: (x, y) => set({ x, y }),
     drag: createDragState(set),
 }));
@@ -84,6 +85,7 @@ export const Window = () => {
         top: state.y+'px',
         width: state.width+'px',
         height: state.height+'px',
+        zIndex: state.z,
     };
 
     useLayoutEffect(() => {

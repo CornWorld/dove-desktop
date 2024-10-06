@@ -7,7 +7,7 @@ interface TooltipProps extends PropsWithChildren{
 
 export const Tooltip = ({children, visible}:TooltipProps) => {
     const ref = useRef<HTMLDivElement>(null);
-    useLayoutEffect(() => {``
+    useLayoutEffect(() => {
         const tooltip = ref.current;
         const screen = document.querySelector<HTMLElement>('#screen');
         if(tooltip && screen) {

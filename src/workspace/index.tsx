@@ -122,7 +122,7 @@ const onMouseUp = () => {
     const state = workspaceStore.getState();
     if (state.drag.dragging) {
         const index = state.drag.dragging - 1;
-        let {x, y} = state.icons[index];
+        const {x, y} = state.icons[index];
         const {snappedX, snappedY} = iconGridSnap(x, y);
 
         window.removeEventListener('mousemove', onMouseMove);
@@ -147,7 +147,7 @@ const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // get the icon index
-    let dataIndex = (e.target as HTMLElement).getAttribute('data-index');
+    const dataIndex = (e.target as HTMLElement).getAttribute('data-index');
     if (dataIndex === null) {
         workspaceStore.getState().cancelSelection();
     } else {
@@ -165,6 +165,7 @@ const onMouseDown = (e: MouseEvent) => {
 export const Workspace = () => {
     const state = workspaceStore((s) => s);
     useEffect(() => {
+        const state = workspaceStore.getState();
         const screen = screenStore.getState().Screen;
         for (let i = 1; i < state.icons.length; i++) {
             let newX = state.icons[i - 1].x, newY = state.icons[i - 1].y + 93 + IconMargin
@@ -185,6 +186,7 @@ export const Workspace = () => {
         height: 'calc(100% - 44px)',
         position: 'absolute',
         userSelect: 'none',
+        zIndex: 1,
     }} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
         {state.icons.map((icon, index) => (
             <div key={index} css={{
