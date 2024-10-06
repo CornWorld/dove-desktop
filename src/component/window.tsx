@@ -1,7 +1,7 @@
 import {create} from "zustand/react";
 import {screenStore} from "../screen.tsx";
 import {createDragState, DraggableState} from "../utils/drag.ts";
-import {useLayoutEffect} from "react";
+import {CSSProperties, useLayoutEffect} from "react";
 
 interface WindowState {
     title: string;
@@ -21,7 +21,7 @@ interface WindowState {
 const windowStore = create<WindowState>((set) => ({
     title: 'Window 1',
     description: 'Window 1 description',
-    icon: '/assets/breeze-icons/icons/apps/16/anydesk.svg',
+    icon: '/icons/apps/systemsettings.svg',
     widgetId: 'widget1',
     active: true,
     height: 675, width: 931,
@@ -95,7 +95,10 @@ export const Window = () => {
 
     return <div className={'window'} style={style}>
         <div className={'headerbar'} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
-            <div className={'windowcontrols left'}></div>
+            <div className={'windowcontrols left'}>
+                <button className={'window-icon'} style={{'--window-icon': 'url('+state.icon+')'} as CSSProperties} />
+                <button className={'pin'} />
+            </div>
             <div><label>awa</label></div>
             <div className={'windowcontrols right'}>
                 <button className={'minimize'}/>

@@ -87,7 +87,7 @@ const AppLauncher = () => {
              onMouseEnter={() => setTooltipVisible(true)}
              onMouseLeave={() => setTooltipVisible(false)}
         >
-            <span className={'icon icon-app-launcher'}/>
+            <span className={'window-icon icon-app-launcher'}/>
             <DescriptionTooltip visible={tooltipVisible} title={'Application Launcher'}
                                 description={'Launcher to start applications'}/>
         </div>
