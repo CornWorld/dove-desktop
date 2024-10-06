@@ -103,9 +103,9 @@ export const Window = () => {
         icon: string;
         sub?: SidebarNode[]; // when sub=undefined or sub.length=0, it doesn't show the arrow
     }
-    
+
     const emptySidebarNode: SidebarNode = {name: '', icon: ''};
-    
+
 
     const sidebarSelections: SidebarSelection[] = [
         {
@@ -120,8 +120,7 @@ export const Window = () => {
                 {name: "Display & Monitor", icon: "preferences-desktop-display.svg", sub: [emptySidebarNode]},
                 {name: "Accessibility", icon: "preferences-desktop-accessibility.svg", sub: [emptySidebarNode]},
             ]
-        },
-        {
+        }, {
             name: "Connected Devices", nodes: [
                 {name: "Bluetooth", icon: "preferences-system-bluetooth.svg", sub: [emptySidebarNode]},
                 {name: "Disks & Cameras", icon: "preferences-system-disks.svg", sub: [emptySidebarNode]},
@@ -129,29 +128,29 @@ export const Window = () => {
                 {name: "KDE Connect", icon: "preferences-kde-connect.svg", sub: [emptySidebarNode]},
                 {name: "Printers", icon: "preferences-devices-printer.svg", sub: [emptySidebarNode]},
             ]
-        },
-        {
+        }, {
             name: "Networking", nodes: [
                 {name: "Wi-Fi & Internet", icon: "categories/applications-internet.svg", sub: [emptySidebarNode]},
                 {name: "Online Accounts", icon: "preferences-online-accounts.svg", sub: [emptySidebarNode]},
             ]
-        },
-        {
+        }, {
             name: "Appearance & Style", nodes: [
                 {name: "Wallpaper", icon: "preferences-desktop-wallpaper.svg", sub: [emptySidebarNode]},
                 {name: "Colors & Themes", icon: "preferences-desktop-theme-global.svg", sub: [emptySidebarNode]},
                 {name: "Text & Fonts", icon: "preferences-desktop-font.svg", sub: [emptySidebarNode]},
             ]
-        },
-        {
+        }, {
             name: "Apps & Windows", nodes: [
-                {name: "Default Applications", icon: "applications-other.svg", sub: [emptySidebarNode]},
-                {name: "Notifications", icon: "preferences-desktop-notification.svg", sub: [emptySidebarNode]},
-                {name: "Window Management", icon: "preferences-desktop-window-management.svg", sub: [emptySidebarNode]},
+                {
+                    name: "Default Applications",
+                    icon: "preferences-desktop-default-applications.svg",
+                    sub: [emptySidebarNode]
+                },
+                {name: "Notifications", icon: "preferences-desktop-notification-bell.svg", sub: [emptySidebarNode]},
+                {name: "Window Management", icon: "preferences-system-windows.svg", sub: [emptySidebarNode]},
                 {name: "Activities", icon: "preferences-desktop-activities.svg", sub: [emptySidebarNode]},
             ]
-        },
-        {
+        }, {
             name: "System", nodes: [
                 {name: "About this System", icon: "status/dialog-information.svg", sub: [emptySidebarNode]},
                 {name: "Power Management", icon: "preferences-system-power-management.svg", sub: [emptySidebarNode]},
@@ -162,7 +161,7 @@ export const Window = () => {
     ];
 
     const getIcon = (icon: string) => {
-        if(icon.includes('/')) {
+        if (icon.includes('/')) {
             return 'url(/icons/' + icon + ')';
         } else {
             return 'url(/icons/preferences/' + icon + ')';
@@ -196,7 +195,7 @@ export const Window = () => {
             <div className={'divider'} ref={headerbarDividerRef}/>
             <div className={'title'}>Quick Settings</div>
         </div>
-        <div className={'sidebar'} css={{'--width': (headerbarLeftWidth+1)+'px'}}>
+        <div className={'sidebar'} css={{'--width': (headerbarLeftWidth + 1) + 'px'}}>
             {sidebarSelections.map((selection, index) => (
                 <div key={index} className={'selection'}>
                     <div className={'name'}>{selection.name}</div>
