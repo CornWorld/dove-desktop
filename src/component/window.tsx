@@ -26,17 +26,17 @@ const windowStore = create<WindowState>((set) => ({
     active: true,
     height: 675, width: 931,
     x: 80, y: 45, z: 3,
-    setPos: (x, y) => set({ x, y }),
+    setPos: (x, y) => set({x, y}),
     drag: createDragState(set),
 }));
 
-const rePosition = (x:number, y:number) => {
+const rePosition = (x: number, y: number) => {
     // check if the window is out of bounds
     const state = windowStore.getState();
     const screen = screenStore.getState().Screen;
-    if(x < 0) {
+    if (x < 0) {
         x = 0;
-    } else if(x + state.width > screen.width) {
+    } else if (x + state.width > screen.width) {
         x = screen.width - state.width;
     }
     if (y < 0) {
@@ -49,9 +49,9 @@ const rePosition = (x:number, y:number) => {
 }
 
 
-const onMouseMove = (e:MouseEvent) => {
+const onMouseMove = (e: MouseEvent) => {
     const state = windowStore.getState();
-    if(state.drag.dragging) {
+    if (state.drag.dragging) {
         const newX = e.clientX - state.drag.offsetX;
         const newY = e.clientY - state.drag.offsetY;
 
@@ -68,7 +68,7 @@ const onMouseUp = () => {
     }
 }
 
-const onMouseDown = (e:MouseEvent) => {
+const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const state = windowStore.getState();
@@ -79,12 +79,12 @@ const onMouseDown = (e:MouseEvent) => {
 
 
 export const Window = () => {
-    const state = windowStore((s)=>s);
+    const state = windowStore((s) => s);
     const style = {
-        left: state.x+'px',
-        top: state.y+'px',
-        width: state.width+'px',
-        height: state.height+'px',
+        left: state.x + 'px',
+        top: state.y + 'px',
+        width: state.width + 'px',
+        height: state.height + 'px',
         zIndex: state.z,
     };
 
@@ -94,7 +94,7 @@ export const Window = () => {
     }, []);
 
     return <div className={'window'} style={style}>
-        <div className={'headerbar'} onMouseDown={(e)=>onMouseDown(e as unknown as MouseEvent)}>
+        <div className={'headerbar'} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
             <div className={'windowcontrols left'}></div>
             <div><label>awa</label></div>
             <div className={'windowcontrols right'}>

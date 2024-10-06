@@ -1,44 +1,44 @@
 import {PropsWithChildren, useLayoutEffect, useRef} from "react";
 import '../breeze.scss';
 
-interface TooltipProps extends PropsWithChildren{
+interface TooltipProps extends PropsWithChildren {
     visible: boolean;
 }
 
-export const Tooltip = ({children, visible}:TooltipProps) => {
+export const Tooltip = ({children, visible}: TooltipProps) => {
     const ref = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
         const tooltip = ref.current;
         const screen = document.querySelector<HTMLElement>('#screen');
-        if(tooltip && screen) {
+        if (tooltip && screen) {
             const rect = tooltip.getBoundingClientRect();
             const screenRect = screen.getBoundingClientRect();
 
-            if(rect.left < screenRect.left) {
+            if (rect.left < screenRect.left) {
                 tooltip.style.left = '0';
             }
-            if(rect.top < screenRect.top) {
+            if (rect.top < screenRect.top) {
                 tooltip.style.top = '0';
             }
-            if(rect.right > screenRect.right) {
+            if (rect.right > screenRect.right) {
                 tooltip.style.right = (rect.right - screenRect.right) + 'px';
             }
-            if(rect.bottom > screenRect.bottom) {
+            if (rect.bottom > screenRect.bottom) {
                 tooltip.style.bottom = (rect.bottom - screenRect.bottom) + 'px';
             }
         }
     }, [visible/* Not a good way, but it works! */]);
-    return <div ref={ref} className={'tooltip background' + (visible ? ' visible' : '')}  >
+    return <div ref={ref} className={'tooltip background' + (visible ? ' visible' : '')}>
         {children}
     </div>
 }
 
-interface DescriptionTooltipProps extends TooltipProps{
+interface DescriptionTooltipProps extends TooltipProps {
     title: string;
     description: string;
 }
 
-export const DescriptionTooltip = ({children, visible, title, description}:DescriptionTooltipProps) => {
+export const DescriptionTooltip = ({children, visible, title, description}: DescriptionTooltipProps) => {
     return <Tooltip visible={visible}>
         <div css={{
             textWrap: 'nowrap',

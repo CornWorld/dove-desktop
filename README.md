@@ -2,7 +2,7 @@
 This is a web page version system desktop, with the design, the icons, and so on of the Breeze Light theme.  
 
 ## References
-Wallpapers: Next / Nexus from Plasma6 Breeze Light (Author: [Krystian Zajdel](mailto://krystian.zajdel@gmail.com))  
+Wallpapers: Next / Nexus from Plasma6 Breeze Light (Author: [Krystian Zajdel](mailto:krystian.zajdel@gmail.com))  
 Icons: [Breeze GTK](https://invent.kde.org/plasma/breeze-gtk), [Breeze Icons](https://invent.kde.org/frameworks/breeze-icons)  
 
 

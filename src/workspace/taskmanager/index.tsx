@@ -34,7 +34,7 @@ const useTaskManagerStore = create<TaskManagerState>((set) => ({
         widgetId: null,
         active: false,
         tooltipVisible: false,
-    },{
+    }, {
         title: 'Kate',
         description: 'Advanced Text Editor',
         icon: '/icons/apps/kate.svg',
@@ -54,10 +54,10 @@ export const TaskManager = () => {
     const state = useTaskManagerStore();
 
     return (<div className={'panel'}>
-        <AppLauncher />
+        <AppLauncher/>
         <ul className={'task-manager'}>
             {state.tasks.map((task, index) => (
-                <li key={index} className={task.active?'active':''}
+                <li key={index} className={task.active ? 'active' : ''}
                     onMouseEnter={() => state.setTaskTooltipVisible(index, true)}
                     onMouseLeave={() => state.setTaskTooltipVisible(index, false)}
                 >
@@ -66,8 +66,8 @@ export const TaskManager = () => {
                         height: '32px',
                         width: '32px',
                         verticalAlign: 'middle',
-                    }} />
-                    {task.widgetId===null && <DescriptionTooltip
+                    }}/>
+                    {task.widgetId === null && <DescriptionTooltip
                         visible={task.tooltipVisible}
                         title={task.title}
                         description={task.description}
@@ -76,7 +76,7 @@ export const TaskManager = () => {
                 </li>
             ))}
         </ul>
-        <DigitalClock />
+        <DigitalClock/>
     </div>);
 }
 
@@ -87,8 +87,9 @@ const AppLauncher = () => {
              onMouseEnter={() => setTooltipVisible(true)}
              onMouseLeave={() => setTooltipVisible(false)}
         >
-            <span className={'icon icon-app-launcher'} />
-            <DescriptionTooltip visible={tooltipVisible} title={'Application Launcher'} description={'Launcher to start applications'} />
+            <span className={'icon icon-app-launcher'}/>
+            <DescriptionTooltip visible={tooltipVisible} title={'Application Launcher'}
+                                description={'Launcher to start applications'}/>
         </div>
     );
 }
@@ -98,14 +99,16 @@ const DigitalClock = () => {
     const [tooltipClock, setTooltipClock] = useState<string>('');
     const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
 
-    const genEffect = (str:string, setClock:(str:string)=>void, refresh=false) => {
+    const genEffect = (str: string, setClock: (str: string) => void, refresh = false) => {
         return () => {
             setClock(dayjs().format(str));
-            if(!refresh) return;
+            if (!refresh) return;
             const interval = setInterval(() => {
                 setClock(dayjs().format(str));
             }, 100);
-            return () => { clearInterval(interval) };
+            return () => {
+                clearInterval(interval)
+            };
         };
     };
 

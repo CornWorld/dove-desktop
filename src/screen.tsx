@@ -20,26 +20,26 @@ export const screenStore = create<ScreenState>((set) => ({
         height: 768,
         backgroundImage: '/wallpapers/light/1024x768.png',
     },
-    resize: (width, height) => set((s)=>({Screen: {...s.Screen,width, height}})),
+    resize: (width, height) => set((s) => ({Screen: {...s.Screen, width, height}})),
 }))
 
 export const Screen = () => {
-    const state = screenStore((s)=>s.Screen);
+    const state = screenStore((s) => s.Screen);
     return <div css={{
         minHeight: state.height,
         minWidth: state.width,
         zIndex: '0',
         position: 'relative',
-        background: state.backgroundImage!==undefined? `url(${state.backgroundImage})` : state.backgroundColor,
+        background: state.backgroundImage !== undefined ? `url(${state.backgroundImage})` : state.backgroundColor,
         border: '0.1px solid black',
         perspective: '1000px',
         // overflow: 'hidden',
-        }} id={'screen'}>
+    }} id={'screen'}>
         <Suspense>
             {/* TODO Loading screen*/}
-            <Workspace />
-            <TaskManager />
-            <Window />
+            <Workspace/>
+            <TaskManager/>
+            <Window/>
         </Suspense>
     </div>
 }

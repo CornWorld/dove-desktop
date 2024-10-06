@@ -71,10 +71,12 @@
     align-items: center;
     padding: 0 10px;
     cursor: pointer;
+
     &.active {
       border-top: 3px solid #9D9DA3;
       background: #bfbfc5;
       box-sizing: border-box;
+
       img {
         margin-top: -3px;
       }
@@ -92,12 +94,14 @@
   box-sizing: border-box;
   cursor: default;
   user-select: none;
+
   span:first-child {
     line-height: 20px;
     font-size: 18px;
     font-weight: 500;
     opacity: 1;
   }
+
   span {
     font-size: 12px;
     line-height: 10px;
@@ -108,11 +112,13 @@
 .digital-clock-tooltip {
   display: flex;
   flex-direction: column;
+
   span:first-child {
     font-size: 24px;
     font-weight: 500;
     line-height: 30px;
   }
+
   span {
     font-size: 14px;
     line-height: 18px;
