@@ -115,7 +115,7 @@ const DigitalClock = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(genEffect('HH:mm:ss\nYYYY/MM/DD', setClock, true), []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(genEffect('dddd\n[UTC]Z HH:mm:ss\nYYYY/MM/DD', setTooltipClock, tooltipVisible), [tooltipVisible]);
+    useEffect(genEffect('dddd\n[UTC]Z HH:mm:ss\nYYYY-MM-DD', setTooltipClock, tooltipVisible), [tooltipVisible]);
 
     return (
         <>

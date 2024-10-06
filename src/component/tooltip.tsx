@@ -54,7 +54,7 @@ export const DescriptionTooltip = ({children, visible, title, description}: Desc
                 fontWeight: 'normal',
             }
         }}>
-            <b>{title}</b>
+            <b className={'heading'}>{title}</b>
             <p>{description}</p>
             {children}
         </div>

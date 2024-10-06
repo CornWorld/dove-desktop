@@ -33,18 +33,30 @@
   }
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 
   .maximized {
     border-radius: 0;
   }
 }
 
-.headerbar {
+@mixin button-no-decoration {
+  border: {
+    color: transparent;
+    image: unset;
+    radius: 0;
+  }
+  box-shadow: none;
+}
+
+.titlebar {
   user-select: none;
-  padding: 0 6px;
+  padding: 0 4px;
   border: {
     width: 0 0 1px 0;
-    radius: 6px 6px 0 0;
+    radius: 6px 6px 0 0; // todo
     color: $borders;
     top: 1px solid $theme_titlebar_background;
   };
@@ -69,15 +81,6 @@
       min-width: 18px;
       margin: 4px 3px;
 
-      @mixin button-no-decoration {
-        border: {
-          color: transparent;
-          image: unset;
-          radius: 0;
-        }
-        box-shadow: none;
-      }
-
       &.window-icon, &.pin,
       &.close, &.close:hover, &.close:active,
       &.maximize, &.maximize:hover, &.maximize:active,
@@ -88,11 +91,11 @@
 
     @mixin recolor-icon($icon, $color) {
       mask: $icon no-repeat center;
-      background: $color 18px;
+      background: $color 16px;
     }
     @mixin icon($icon) {
       background: $icon no-repeat center;
-      background-size: 18px;
+      background-size: 16px;
       border-radius: 0;
       mask: none;
     }
@@ -100,7 +103,7 @@
     button.window-icon {
       background: var(--window-icon) no-repeat center;
       background-size: 22px;
-      margin-right: 4px;
+      margin-right: 3px;
     }
 
     button.pin {
@@ -142,6 +145,27 @@
         @include recolor-icon(url(/public/icons/actions/breeze-minimize-active-symbolic.svg), $theme_titlebar_foreground);
       }
     }
+  }
+}
+
+.headerbar {
+  background-color: $theme_titlebar_background;
+  color: $theme_titlebar_foreground;
+  display: flex;
+  flex-direction: row;
+  user-select: none;
+  padding: 4px 10px;
+  border: {
+    width: 0 0 1px 0;
+    radius: 6px 6px 0 0;
+    color: $borders;
+    top: 1px solid $theme_titlebar_background;
+  };
+  button {
+    @include button-no-decoration;
+  }
+  > * {
+    margin: 0.5px 5.5px;
   }
 }
 
