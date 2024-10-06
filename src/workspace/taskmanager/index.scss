@@ -183,13 +183,14 @@
 .sidebar {
   background: $colors-view-background-normal;
   color: $colors-view-foreground-normal;
-  width: 256px;
+  width: var(--width);
   height: 100%;
   border-right: 1px $borders solid;
   padding: 7px;
   letter-spacing: 0.7px;
   user-select: none;
   overflow-y: auto;
+  box-sizing: border-box;
 
   >* {
     border: none;

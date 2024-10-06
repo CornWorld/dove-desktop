@@ -1,7 +1,7 @@
 import {create} from "zustand/react";
 import {screenStore} from "../screen.tsx";
 import {createDragState, DraggableState} from "../utils/drag.ts";
-import {CSSProperties, useLayoutEffect} from "react";
+import {createRef, CSSProperties, useLayoutEffect} from "react";
 
 interface WindowState {
     title: string;
@@ -169,6 +169,9 @@ export const Window = () => {
         }
     }
 
+    const headerbarDividerRef = createRef<HTMLDivElement>();
+    const headerbarLeftWidth = headerbarDividerRef.current?.offsetLeft ?? 270;
+
     return <div className={'window system-control'} style={style}>
         <div className={'titlebar'} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
             <div className={'windowcontrols left'}>
@@ -190,25 +193,10 @@ export const Window = () => {
                 <input type={'text'} placeholder={'Search'}/>
             </div>
             <button className={'actions'}></button>
-            <div className={'divider'}/>
+            <div className={'divider'} ref={headerbarDividerRef}/>
             <div className={'title'}>Quick Settings</div>
         </div>
-        <div className={'sidebar'}>
-            {/*<div className={'selection'}>*/}
-            {/*    <div className={'name'}>Input & Output</div>*/}
-            {/*    <div className={'item link'}>*/}
-            {/*        <span className={'icon icon-mouse'}/>*/}
-            {/*        <span>Mouse & Touchpad</span>*/}
-            {/*    </div>*/}
-            {/*    <div className={'item link'}>*/}
-            {/*        <span className={'icon icon-keyboard'}/>*/}
-            {/*        <span>Keyboard</span>*/}
-            {/*    </div>*/}
-            {/*    <div className={'item'}>*/}
-            {/*        <span className={'icon icon-display'}/>*/}
-            {/*        <span>Display & Monitor</span>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
+        <div className={'sidebar'} css={{'--width': (headerbarLeftWidth+1)+'px'}}>
             {sidebarSelections.map((selection, index) => (
                 <div key={index} className={'selection'}>
                     <div className={'name'}>{selection.name}</div>
