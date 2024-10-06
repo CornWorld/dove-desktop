@@ -94,13 +94,12 @@ const AppLauncher = () => {
 }
 
 const DigitalClock = () => {
-    const [clock, setClock] = useState<string>('');``
+    const [clock, setClock] = useState<string>('');
     const [tooltipClock, setTooltipClock] = useState<string>('');
     const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
 
     const genEffect = (str:string, setClock:(str:string)=>void, refresh=false) => {
-        return () => {``
-            let interval: number;
+        return () => {
             setClock(dayjs().format(str));
             if(!refresh) return;
             interval = setInterval(() => {
