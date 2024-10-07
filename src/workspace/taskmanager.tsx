@@ -3,13 +3,14 @@ import {DescriptionTooltip} from "../component/tooltip.tsx";
 import {produce} from "immer";
 import {useEffect} from "react";
 import {createDragState, DraggableState} from "../utils/drag.ts";
+import {onClickTaskIcon} from "../component/window.tsx";
 
 interface Task {
     title: string;
     description: string;
     icon: string;
     isWindow: boolean;
-    widgetId: string | null;
+    windowId: string | null;
     active: boolean;
     tooltipVisible: boolean;
     x: number;
@@ -22,14 +23,15 @@ interface TaskManagerState {
     setTaskPosition: (index: number, x: number) => void;
     swapTaskPosition: (index1: number, index2: number) => void;
     setTaskActive: (index: number, active: boolean) => void;
+    setWindowId: (index: number, windowId: string|null) => void;
 }
 
-const taskManagerStore = create<TaskManagerState>((set) => ({
+export const taskManagerStore = create<TaskManagerState>((set) => ({
     tasks: [{
         title: 'System Settings',
         description: 'Configuration tools for your computer',
         icon: '/icons/apps/systemsettings.svg',
-        widgetId: 'widget1',
+        windowId: 'widget1',
         isWindow: true,
         active: true,
         tooltipVisible: false,
@@ -38,7 +40,7 @@ const taskManagerStore = create<TaskManagerState>((set) => ({
         title: 'Ark',
         description: 'Achieving Tool',
         icon: '/icons/apps/ark.svg',
-        widgetId: 'widget2',
+        windowId: 'widget2',
         isWindow: true,
         active: false,
         tooltipVisible: false,
@@ -48,7 +50,7 @@ const taskManagerStore = create<TaskManagerState>((set) => ({
         description: 'Advanced Text Editor',
         icon: '/icons/apps/kate.svg',
         isWindow: false,
-        widgetId: null,
+        windowId: null,
         active: false,
         tooltipVisible: false,
         x: 0,
@@ -80,6 +82,16 @@ const taskManagerStore = create<TaskManagerState>((set) => ({
                 draft.tasks[index].active = active;
             })
         ),
+    setWindowId: (index, windowId) =>
+        set((state) =>
+            produce(state, (draft) => {
+                draft.tasks[index].windowId = windowId;
+                if(windowId === null) {
+                    draft.tasks[index].active = false;
+                    draft.tasks[index].isWindow = false;
+                }
+            })
+        ),
 }));
 
 const taskWidth = 52, taskGap = 2;
@@ -106,10 +118,18 @@ const makeTaskToPosition = (index: number, towardsX: number) => {
         swapAndShift(currX - 1, towardsX - 1, -1);
     }
 };
+
+const defaultLastMouseDownState =  {
+    index: -1,
+    time: -1,
+};
+let lastMouseDownState = defaultLastMouseDownState;
+
 const onMouseMove = (e: MouseEvent) => {
     const state = taskManagerStore.getState();
 
     if (state.drag.dragging) {
+        lastMouseDownState = defaultLastMouseDownState;
         const icon = document.getElementById('dragging-icon');
         if (!icon) return;
         icon.style.display = 'block';
@@ -139,6 +159,13 @@ const onMouseMove = (e: MouseEvent) => {
 const onMouseUp = () => {
     const state = taskManagerStore.getState();
     if (state.drag.dragging) {
+        if(lastMouseDownState !== defaultLastMouseDownState) {
+            const time = new Date().getTime();
+            if (time - lastMouseDownState.time < 200) {
+                if(state.drag.dragging === 1) onClickTaskIcon();
+            }
+        }
+        lastMouseDownState = defaultLastMouseDownState;
         document.getElementById('dragging-icon')?.remove();
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
@@ -168,6 +195,10 @@ const onMouseDown = (e: MouseEvent) => {
     icon.id = 'dragging-icon';
     document.body.appendChild(icon);
 
+    lastMouseDownState = {
+        index,
+        time: new Date().getTime(),
+    }
     state.drag.startDrag(0, state.tasks[index].active ? 1 : 0, index + 1);
     state.setTaskActive(index, true);
     window.addEventListener('mousemove', onMouseMove);

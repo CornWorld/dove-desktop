@@ -3,6 +3,7 @@ import {screenStore} from "../screen.tsx";
 import {createDragState, DraggableState} from "../utils/drag.ts";
 import {createRef, CSSProperties, useLayoutEffect} from "react";
 import {workspaceStore} from "../workspace";
+import {taskManagerStore} from "../workspace/taskmanager.tsx";
 
 export interface WindowState {
     title: string;
@@ -15,7 +16,18 @@ export interface WindowState {
     x: number;
     y: number;
     z: number;
+    status: string;
+    originInfo: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }
     setPos: (x: number, y: number) => void;
+    setSize: (width: number, height: number) => void;
+    setStatus: (status: string) => void;
+    setActive: (a:boolean) => void;
+
     drag: DraggableState;
 }
 
@@ -26,10 +38,73 @@ const windowStore = create<WindowState>((set) => ({
     id: 'widget1',
     active: true,
     height: 675, width: 931,
-    x: 80, y: 45, z: 3,
+    x: 80, y: 35, z: 3,
+    status: 'normal',
+    originInfo: {
+        x: 80, y: 45, width: 931, height: 675,
+    },
     setPos: (x, y) => set({x, y}),
+    setSize: (width, height) => set({width, height}),
+    setStatus: (status) => set({status}),
+    setActive: (a) => set({active: a}),
+
     drag: createDragState(set),
 }));
+
+const maximize = () => {
+    const state = windowStore.getState();
+    state.setStatus('maximized');
+    const screen = screenStore.getState().Screen;
+    state.setPos(0, 0);
+    state.setSize(screen.width, screen.height);
+}
+
+const rev_maximize = () => {
+    const state = windowStore.getState();
+    if(state.status === 'maximized') {
+        state.setStatus('normal');
+        state.setPos(state.originInfo.x, state.originInfo.y);
+        state.setSize(state.originInfo.width, state.originInfo.height);
+    }
+}
+
+const minimize = () => {
+    const state = windowStore.getState();
+    state.setStatus('minimized');
+    state.setPos(0, screenStore.getState().Screen.height + 100);
+}
+
+const close = () => {
+    document.getElementById('widget1')?.remove();
+    taskManagerStore.getState().setWindowId(0, null);
+}
+
+const rev_minimize = () => {
+    const state = windowStore.getState();
+    if(state.status === 'minimized') {
+        state.setStatus('normal');
+        state.setPos(state.originInfo.x, state.originInfo.y);
+        state.setSize(state.originInfo.width, state.originInfo.height);
+    }
+}
+
+export const onClickTaskIcon = () => {
+    const state = windowStore.getState();
+    if(state.status === 'minimized') {
+        rev_minimize();
+    } else if(state.status === 'normal') {
+        minimize();
+    }
+}
+
+const onDBClick = () => {
+    const state = windowStore.getState();
+    if (state.status === 'maximized') {
+        rev_maximize();
+    } else {
+        maximize();
+    }
+}
 
 const rePosition = (x: number, y: number) => {
     // check if the window is out of bounds
@@ -48,7 +123,7 @@ const rePosition = (x: number, y: number) => {
 
     // check window's position. if it's too close to the edge, float the panel
     const workspace = workspaceStore.getState();
-    if(screen.height - y - state.height < 44 + 7) {
+    if (screen.height - y - state.height < 44 + 7) {
         workspace.setPanelFloat(false);
     } else {
         workspace.setPanelFloat(true);
@@ -57,13 +132,15 @@ const rePosition = (x: number, y: number) => {
     state.setPos(x, y);
 }
 
+const defaultLastMouseDownState = {index: -1, time: 0};
+let lastMouseDownState = defaultLastMouseDownState;
 
 const onMouseMove = (e: MouseEvent) => {
     const state = windowStore.getState();
     if (state.drag.dragging) {
         const newX = e.clientX - state.drag.offsetX;
         const newY = e.clientY - state.drag.offsetY;
-
+        lastMouseDownState = defaultLastMouseDownState;
         rePosition(newX, newY);
     }
 };
@@ -80,6 +157,15 @@ const onMouseUp = () => {
 const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    const ele = e.target as HTMLElement;
+    if(ele && ele.tagName==='BUTTON' || ele.tagName==='INPUT') return;
+    if(lastMouseDownState !== defaultLastMouseDownState) {
+        const time = new Date().getTime();
+        if (time - lastMouseDownState.time < 200) {
+            if(windowStore.getState().drag.dragging === 1) onDBClick();
+        }
+    }
+    lastMouseDownState = {index: -1, time: new Date().getTime()};
     const state = windowStore.getState();
     state.drag.startDrag(e.clientX - state.x, e.clientY - state.y);
     window.addEventListener('mousemove', onMouseMove);
@@ -180,7 +266,7 @@ export const Window = () => {
     const headerbarDividerRef = createRef<HTMLDivElement>();
     const headerbarLeftWidth = headerbarDividerRef.current?.offsetLeft ?? 270;
 
-    return <div className={'window system-control'} style={style}>
+    return <div className={'window system-control'} style={style} id={'widget1'}>
         <div className={'titlebar'} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
             <div className={'windowcontrols left'}>
                 <button className={'window-icon'}
@@ -189,9 +275,9 @@ export const Window = () => {
             </div>
             <div><label>Quick Settings — System Settings</label></div>
             <div className={'windowcontrols right'}>
-                <button className={'minimize'}/>
-                <button className={'maximize'}/>
-                <button className={'close'}/>
+                <button className={'minimize'} onClick={minimize}/>
+                <button className={'maximize'} onClick={maximize}/>
+                <button className={'close'} onClick={close}/>
             </div>
         </div>
         <div className={'headerbar'}>
