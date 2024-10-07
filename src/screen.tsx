@@ -1,7 +1,6 @@
 import {Workspace} from "./workspace";
 import {Suspense} from "react";
 import {create} from "zustand/react";
-import {TaskManager} from "./workspace/taskmanager";
 import {Window} from "./component/window.tsx";
 
 interface ScreenState {
@@ -38,7 +37,6 @@ export const Screen = () => {
         <Suspense>
             {/* TODO Loading screen*/}
             <Workspace/>
-            <TaskManager/>
             <Window/>
         </Suspense>
     </div>

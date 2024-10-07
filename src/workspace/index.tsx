@@ -3,6 +3,10 @@ import {produce} from "immer";
 import {createDragState, DraggableState} from "../utils/drag.ts";
 import {useEffect} from "react";
 import {screenStore} from "../screen.tsx";
+import {TaskManager} from "./taskmanager.tsx";
+import {AppLauncher} from "./app-launcher.tsx";
+import {DigitalClock} from "./digital-clock.tsx";
+import './index.scss';
 
 interface Icon {
     title: string;
@@ -181,45 +185,52 @@ export const Workspace = () => {
         }
     }, [])
 
-    return <div css={{
-        width: '100%',
-        height: 'calc(100% - 44px)',
-        position: 'absolute',
-        userSelect: 'none',
-        zIndex: 1,
-    }} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
-        {state.icons.map((icon, index) => (
-            <div key={index} css={{
-                borderRadius: '5px',
-                width: '103px',
-                height: '93px',
-                margin: '5px',
-                padding: '5px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                position: 'absolute',
-                boxSizing: 'border-box',
-                zIndex: '2',
-            }} style={{
-                left: icon.x, top: icon.y,
-                outline: icon.selected ? '1px solid rgb(61, 174, 233)' : '0',
-                backgroundColor: icon.selected ? 'rgba(61, 174, 233, 0.2)' : 'transparent',
-            }}>
-                <img src={icon.icon} alt={icon.title} css={{
-                    width: '64px',
-                    margin: 'auto',
-                    height: '64px',
-                    cursor: 'pointer',
-                }} data-index={index}/>
-                <span css={{
-                    color: 'white',
-                    fontSize: '13px',
-                    fontWeight: 'medium',
-                }}>awa</span>
-            </div>
-        ))}
-    </div>
+    return <>
+        <div className={'panel'}>
+            <AppLauncher/>
+            <TaskManager/>
+            <DigitalClock/>
+        </div>
+        <div css={{
+            width: '100%',
+            height: 'calc(100% - 44px)',
+            position: 'absolute',
+            userSelect: 'none',
+            zIndex: 1,
+        }} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
+            {state.icons.map((icon, index) => (
+                <div key={index} css={{
+                    borderRadius: '5px',
+                    width: '103px',
+                    height: '93px',
+                    margin: '5px',
+                    padding: '5px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    boxSizing: 'border-box',
+                    zIndex: '2',
+                }} style={{
+                    left: icon.x, top: icon.y,
+                    outline: icon.selected ? '1px solid rgb(61, 174, 233)' : '0',
+                    backgroundColor: icon.selected ? 'rgba(61, 174, 233, 0.2)' : 'transparent',
+                }}>
+                    <img src={icon.icon} alt={icon.title} css={{
+                        width: '64px',
+                        margin: 'auto',
+                        height: '64px',
+                        cursor: 'pointer',
+                    }} data-index={index}/>
+                    <span css={{
+                        color: 'white',
+                        fontSize: '13px',
+                        fontWeight: 'medium',
+                    }}>awa</span>
+                </div>
+            ))}
+        </div>
+    </>
 
 }
