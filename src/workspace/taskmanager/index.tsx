@@ -9,6 +9,7 @@ interface Task {
     title: string;
     description: string;
     icon: string;
+    isWindow: boolean;
     widgetId: string | null;
     active: boolean;
     tooltipVisible: boolean;
@@ -25,19 +26,22 @@ const useTaskManagerStore = create<TaskManagerState>((set) => ({
         description: 'Configuration tools for your computer',
         icon: '/icons/apps/systemsettings.svg',
         widgetId: 'widget1',
+        isWindow: true,
         active: true,
         tooltipVisible: false,
     }, {
         title: 'Ark',
         description: 'Achieving Tool',
         icon: '/icons/apps/ark.svg',
-        widgetId: null,
+        widgetId: 'widget2',
+        isWindow: true,
         active: false,
         tooltipVisible: false,
     }, {
         title: 'Kate',
         description: 'Advanced Text Editor',
         icon: '/icons/apps/kate.svg',
+        isWindow: false,
         widgetId: null,
         active: false,
         tooltipVisible: false,
@@ -57,7 +61,9 @@ export const TaskManager = () => {
         <AppLauncher/>
         <ul className={'task-manager'}>
             {state.tasks.map((task, index) => (
-                <li key={index} className={task.active ? 'active' : ''}
+                <li key={index} className={
+                    task.active ? 'active' : task.isWindow ? 'inactive': ''
+                }
                     onMouseEnter={() => state.setTaskTooltipVisible(index, true)}
                     onMouseLeave={() => state.setTaskTooltipVisible(index, false)}
                 >
@@ -67,7 +73,7 @@ export const TaskManager = () => {
                         width: '32px',
                         verticalAlign: 'middle',
                     }}/>
-                    {task.widgetId === null && <DescriptionTooltip
+                    {!task.isWindow && <DescriptionTooltip
                         visible={task.tooltipVisible}
                         title={task.title}
                         description={task.description}
