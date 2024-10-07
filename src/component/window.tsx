@@ -195,19 +195,61 @@ export const Window = () => {
             <div className={'divider'} ref={headerbarDividerRef}/>
             <div className={'title'}>Quick Settings</div>
         </div>
-        <div className={'sidebar'} css={{'--width': (headerbarLeftWidth + 1) + 'px'}}>
-            {sidebarSelections.map((selection, index) => (
-                <div key={index} className={'selection'}>
-                    <div className={'name'}>{selection.name}</div>
-                    {selection.nodes.map((node, index) => (
-                        <div key={index} className={'item'}>
-                            <span className={'icon'} css={{'--icon': getIcon(node.icon)}}/>
-                            <span>{node.name}</span>
-                        </div>
-                    ))}
+        <div css={{
+            display: 'flex',
+            flexDirection: 'row',
+            userSelect: 'none',
+            height: '100%',
+            overflow: 'auto',
+        }}>
+            <div className={'sidebar'} css={{'--width': (headerbarLeftWidth + 1) + 'px'}}>
+                {sidebarSelections.map((selection, index) => (
+                    <div key={index} className={'selection'}>
+                        <div className={'name'}>{selection.name}</div>
+                        {selection.nodes.map((node, index) => (
+                            <div key={index} className={'item'}>
+                                <span className={'icon'} css={{'--icon': getIcon(node.icon)}}/>
+                                <span>{node.name}</span>
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+            <div className={'content quick-setting'}>
+                {/* TODO: add label layout */}
+                <div>
+                    <span>Theme</span>
+                    <select onChange={(e) => {
+                        const theme = e.target.value;
+                        document.documentElement.setAttribute('data-theme', theme);
+                    }} css={{ // TODO
+                        marginLeft: '10px',
+                        padding: '5px',
+                        borderRadius: '5px',
+                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                    }}>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
                 </div>
-            ))}
+                <div>
+                    <span>Animation speed</span>
+                </div>
+                <div css={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                }}>
+                    <button>Change Wallpaper...</button>
+                    <button>More Appearance Settings...</button>
+                </div>
+                <div className={'divider'}/>
+                <div>
+                    <span>Clicking files or folders</span>
+                </div>
+                <div>
+                    <span>Most Used Pages</span>
+                </div>
+            </div>
         </div>
-
     </div>
 }
