@@ -62,13 +62,13 @@
 }
 
 .task-manager {
+  -webkit-user-drag: none;
+  position: relative;
   list-style-type: none;
   height: 100%;
   width: 100%;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: row;
   user-select: none;
   flex-wrap: nowrap;
 
@@ -76,7 +76,7 @@
     border-top: 3px solid rgba($colors-view-foreground-inactive, 0.6);
     box-sizing: border-box;
 
-    img {
+    span {
       margin-top: -3px;
     }
     &:hover {
@@ -90,13 +90,15 @@
   }
 
   li {
+    position: absolute;
+    left: calc(var(--x) * calc(52px + 2px));
     height: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 0 10px;
     cursor: pointer;
-    margin-right: 2px;
+    transition: ease-in-out 0.2s;
 
     &.active {
       background: rgba($colors-view-foreground-active, 0.25);
@@ -114,13 +116,6 @@
         transition: filter 0.15s;
       }
     }
-
-    //&.shift-left {
-    //  transform: translateX(calc(-100% - 2px));
-    //}
-    //&.shift-right {
-    //  transform: translateX(calc(100% + 2px));
-    //}
   }
 }
 

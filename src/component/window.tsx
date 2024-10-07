@@ -2,12 +2,13 @@ import {create} from "zustand/react";
 import {screenStore} from "../screen.tsx";
 import {createDragState, DraggableState} from "../utils/drag.ts";
 import {createRef, CSSProperties, useLayoutEffect} from "react";
+import {workspaceStore} from "../workspace";
 
-interface WindowState {
+export interface WindowState {
     title: string;
     description: string;
     icon: string;
-    widgetId: string;
+    id: string;
     active: boolean;
     height: number;
     width: number;
@@ -22,7 +23,7 @@ const windowStore = create<WindowState>((set) => ({
     title: 'Window 1',
     description: 'Window 1 description',
     icon: '/icons/apps/systemsettings.svg',
-    widgetId: 'widget1',
+    id: 'widget1',
     active: true,
     height: 675, width: 931,
     x: 80, y: 45, z: 3,
@@ -43,6 +44,14 @@ const rePosition = (x: number, y: number) => {
         y = 0;
     } else if (y + state.height > screen.height) {
         y = screen.height - state.height;
+    }
+
+    // check window's position. if it's too close to the edge, float the panel
+    const workspace = workspaceStore.getState();
+    if(screen.height - y - state.height < 44 + 7) {
+        workspace.setPanelFloat(false);
+    } else {
+        workspace.setPanelFloat(true);
     }
 
     state.setPos(x, y);
