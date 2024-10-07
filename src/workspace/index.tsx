@@ -33,10 +33,13 @@ interface WorkspaceState {
     setIconPos: (index: number, x: number, y: number) => void,
     cancelSelection: () => void,
 
+    panelFloat: boolean;
+    setPanelFloat: (float: boolean) => void;
+
     drag: DraggableState;
 }
 
-const workspaceStore = create<WorkspaceState>((set) => ({
+export const workspaceStore = create<WorkspaceState>((set) => ({
     icons: exampleIcons,
     setIconPos: (index, x, y) => set((state) =>
         produce(state, (draft) => {
@@ -51,6 +54,9 @@ const workspaceStore = create<WorkspaceState>((set) => ({
         produce(state, (draft) => {
             draft.icons.forEach((icon) => icon.selected = false);
         })),
+
+    panelFloat: false,
+    setPanelFloat: (float) => set(() => ({panelFloat: float})),
 
     drag: createDragState(set),
 }));
@@ -183,10 +189,10 @@ export const Workspace = () => {
             }
             state.setIconPos(i, newX, newY);
         }
-    }, [])
+    }, []);
 
     return <>
-        <div className={'panel'}>
+        <div className={'panel' + (state.panelFloat ? ' float' : '')}>
             <AppLauncher/>
             <TaskManager/>
             <DigitalClock/>

@@ -19,9 +19,9 @@
   visibility: hidden;
   opacity: 0;
   transition: opacity ease-in-out 0.3s, 0.3s;
-  transition-delay: 1s;
 
   &.visible {
+    transition-delay: 1s;
     visibility: visible;
     opacity: 1;
   }
