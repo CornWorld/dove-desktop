@@ -2,10 +2,10 @@ import {Headerbar, HeaderbarRef} from "../../component/headerbar.tsx";
 import {createSidebarNode, Sidebar, SidebarSelection} from "../../component/sidebar.tsx";
 import {useRef} from "react";
 import './settings.scss'
-import {createWindow, useDefaultWindowFunc} from "../../component/window.tsx";
+import {CreateWindow, createWindowStore} from "../../component/window.tsx";
 import {QuickSettings} from "./quick-settings.tsx";
 
-const windowStore = useDefaultWindowFunc({
+const windowStore = createWindowStore({
     title: 'Window 1',
     description: 'Window 1 description',
     icon: '/icons/apps/systemsettings.svg',
@@ -70,7 +70,7 @@ export const Settings = () => {
     ];
     const headerbarRef = useRef<HeaderbarRef>(null);
 
-    return createWindow(windowStore, ['quick-settings'],
+    return CreateWindow(windowStore, ['quick-settings'],
         <>
             <Headerbar ref={headerbarRef}/>
             <div css={{

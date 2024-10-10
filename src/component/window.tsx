@@ -68,7 +68,7 @@ const rePos = (state: WindowState, x: number, y: number) => {
     return {x, y};
 }
 
-export const useDefaultWindowFunc = (state: WindowState) => {
+export const createWindowStore = (state: WindowState) => {
     const store = create<WindowStore>((set) => ({
         ...state,
         originInfo: {
@@ -145,7 +145,7 @@ export const useDefaultWindowFunc = (state: WindowState) => {
     return store;
 }
 
-export const createWindow = (
+export const CreateWindow = (
     store: UseBoundStore<StoreApi<WindowStore>>,
     customCss: string[] = [],
     content: JSX.Element,
@@ -162,7 +162,6 @@ export const createWindow = (
         const ele = document.getElementById(state.id);
         if (ele) {
             ele.addEventListener('clickTaskIcon', state.onClickTaskIcon);
-            ele.addEventListener('mousedown', state.onMouseDown);
             ele.addEventListener('dblclick', state.onDBClick);
         }
         state.setPos(state.x, state.y);
@@ -170,7 +169,6 @@ export const createWindow = (
         return () => {
             if (ele) {
                 ele.removeEventListener('clickTaskIcon', state.onClickTaskIcon);
-                ele.removeEventListener('mousedown', state.onMouseDown);
                 ele.removeEventListener('dblclick', state.onDBClick);
             }
         }
@@ -180,8 +178,7 @@ export const createWindow = (
         <div className={'titlebar'}
              onMouseDown={(e) => {
                  state.onMouseDown(e as unknown as MouseEvent)
-             }
-             }
+             }}
         >
             <div className={'windowcontrols left'}>
                 <button className={'window-icon'}
