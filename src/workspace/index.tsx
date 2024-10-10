@@ -138,6 +138,10 @@ const onMouseUp = () => {
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
 
+        if(x === snappedX && y === snappedY) {
+            state.setIconPos(index, x+1, y+1); // let `getIconIndexByPos` cannot find the icon which is being dragged
+        }
+
         const resIndex = getIconIndexByPos(snappedX, snappedY);
         // TODO
 
