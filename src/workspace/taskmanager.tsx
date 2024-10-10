@@ -3,7 +3,6 @@ import {DescriptionTooltip} from "../component/tooltip.tsx";
 import {produce} from "immer";
 import {useEffect} from "react";
 import {createDragState, DraggableState} from "../utils/drag.ts";
-import {onClickTaskIcon} from "../component/window.tsx";
 
 interface Task {
     title: string;
@@ -31,7 +30,7 @@ export const taskManagerStore = create<TaskManagerState>((set) => ({
         title: 'System Settings',
         description: 'Configuration tools for your computer',
         icon: '/icons/apps/systemsettings.svg',
-        windowId: 'widget1',
+        windowId: 'window1',
         isWindow: true,
         active: true,
         tooltipVisible: false,
@@ -40,7 +39,7 @@ export const taskManagerStore = create<TaskManagerState>((set) => ({
         title: 'Ark',
         description: 'Achieving Tool',
         icon: '/icons/apps/ark.svg',
-        windowId: 'widget2',
+        windowId: 'window2',
         isWindow: true,
         active: false,
         tooltipVisible: false,
@@ -162,7 +161,11 @@ const onMouseUp = () => {
         if(lastMouseDownState !== defaultLastMouseDownState) {
             const time = new Date().getTime();
             if (time - lastMouseDownState.time < 200) {
-                if(state.drag.dragging === 1) onClickTaskIcon();
+                if(state.drag.dragging === 1) {
+                    const event = new Event('clickTaskIcon');
+                    const id = state.tasks[lastMouseDownState.index].windowId;
+                    if(id) document.getElementById(id)?.dispatchEvent(event);
+                }
             }
         }
         lastMouseDownState = defaultLastMouseDownState;
@@ -173,6 +176,7 @@ const onMouseUp = () => {
     }
 }
 
+// TODO: Add touch event handling
 const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

@@ -1,7 +1,7 @@
 import {Workspace} from "./workspace";
 import {Suspense} from "react";
 import {create} from "zustand/react";
-import {Window} from "./component/window.tsx";
+import { Settings } from "./app/settings";
 
 interface ScreenState {
     Screen: {
@@ -34,10 +34,10 @@ export const Screen = () => {
         perspective: '1000px',
         // overflow: 'hidden',
     }} id={'screen'}>
-        <Suspense>
+        <Suspense fallback={<></>}>
             {/* TODO Loading screen*/}
             <Workspace/>
-            <Window/>
+            <Settings />
         </Suspense>
     </div>
 }
