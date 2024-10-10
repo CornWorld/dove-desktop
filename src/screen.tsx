@@ -1,7 +1,7 @@
 import {Workspace} from "./workspace";
 import {Suspense} from "react";
 import {create} from "zustand/react";
-import { Settings } from "./app/settings";
+import {Settings} from "./app/settings";
 
 interface ScreenState {
     Screen: {
@@ -37,7 +37,7 @@ export const Screen = () => {
         <Suspense fallback={<></>}>
             {/* TODO Loading screen*/}
             <Workspace/>
-            <Settings />
+            <Settings/>
         </Suspense>
     </div>
 }

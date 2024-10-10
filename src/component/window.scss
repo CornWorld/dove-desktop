@@ -131,9 +131,11 @@
       color: $borders;
       top: 1px solid $theme_titlebar_background;
     };
+
     button {
       @include button-no-decoration;
     }
+
     > * {
       margin: 0.5px 5.5px;
     }

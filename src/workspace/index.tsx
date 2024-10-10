@@ -217,7 +217,7 @@ export const Workspace = () => {
                     alignItems: 'center',
                     position: 'absolute',
                     boxSizing: 'border-box',
-                    zIndex: state.drag.dragging -1 === index? '3': '2',
+                    zIndex: state.drag.dragging - 1 === index ? '3' : '2',
                 }} style={{
                     left: icon.x, top: icon.y,
                     outline: icon.selected ? '1px solid rgb(61, 174, 233)' : '0',

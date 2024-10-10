@@ -93,6 +93,7 @@ button {
     border: $borders 1px solid;
     border-radius: 1.25mm;
     box-sizing: border-box;
+
     &:focus {
       outline: none;
       border-color: $theme_selected_bg_color;

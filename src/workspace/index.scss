@@ -87,38 +87,46 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    > *{
+
+    > * {
       display: flex;
       flex-direction: row;
       align-items: center;
     }
+
     > *:first-child {
       width: var(--left-width);
     }
   }
+
   .headerbar {
     background-color: $colors-header-background-normal;
     height: 47px;
     box-sizing: border-box;
     padding: 2px;
+
     .user {
       span:nth-child(2) {
         margin-left: 45px;
         font-weight: bold;
       }
     }
+
     .search {
       flex-grow: 1;
       margin-right: 5px;
     }
+
     button {
       height: 30px;
       width: 30px;
       border: none;
+
       &.configure {
         background: url(/public/icons/actions/configure.svg) no-repeat center;
         background-size: 22px;
       }
+
       &.pin {
         background: url(/public/icons/actions/window-pin.svg) no-repeat center;
         background-size: 22px;
@@ -126,6 +134,7 @@
     }
 
   }
+
   .content {
     display: flex;
     flex-direction: row;
@@ -137,23 +146,27 @@
 
     > .sidebar {
       > .selection:first-child {
-        .name{
+        .name {
           &::after {
             content: none;
           }
         }
       }
+
       .item {
         margin: 2px;
         padding: 0 4px;
       }
-      .name{
+
+      .name {
         margin: 0;
+
         ::after {
           margin-left: 0;
         }
       }
     }
+
     .icons {
       flex-grow: 1;
     }
@@ -192,11 +205,13 @@
     span {
       margin-top: -3px;
     }
+
     &:hover {
       border-color: rgba($colors-view-foreground-active, 0.6);
       background: rgba($colors-view-foreground-active, 0.25);
     }
   }
+
   .bar-active {
     @extend .bar;
     border-color: rgba($colors-view-foreground-active, 0.6);
@@ -274,23 +289,23 @@
 }
 
 .title-1 {
-    font-weight: 800;
-    font-size: 20pt;
+  font-weight: 800;
+  font-size: 20pt;
 }
 
 .title-2 {
-    font-weight: 800;
-    font-size: 15pt;
+  font-weight: 800;
+  font-size: 15pt;
 }
 
 .title-3 {
-    font-weight: 700;
-    font-size: 15pt;
+  font-weight: 700;
+  font-size: 15pt;
 }
 
 .title-4 {
-    font-weight: 700;
-    font-size: 13pt;
+  font-weight: 700;
+  font-size: 13pt;
 }
 
 .heading {

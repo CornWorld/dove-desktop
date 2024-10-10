@@ -22,7 +22,7 @@ interface TaskManagerState {
     setTaskPosition: (index: number, x: number) => void;
     swapTaskPosition: (index1: number, index2: number) => void;
     setTaskActive: (index: number, active: boolean) => void;
-    setWindowId: (index: number, windowId: string|null) => void;
+    setWindowId: (index: number, windowId: string | null) => void;
 }
 
 export const taskManagerStore = create<TaskManagerState>((set) => ({
@@ -85,7 +85,7 @@ export const taskManagerStore = create<TaskManagerState>((set) => ({
         set((state) =>
             produce(state, (draft) => {
                 draft.tasks[index].windowId = windowId;
-                if(windowId === null) {
+                if (windowId === null) {
                     draft.tasks[index].active = false;
                     draft.tasks[index].isWindow = false;
                 }
@@ -118,7 +118,7 @@ const makeTaskToPosition = (index: number, towardsX: number) => {
     }
 };
 
-const defaultLastMouseDownState =  {
+const defaultLastMouseDownState = {
     index: -1,
     time: -1,
 };
@@ -158,13 +158,13 @@ const onMouseMove = (e: MouseEvent) => {
 const onMouseUp = () => {
     const state = taskManagerStore.getState();
     if (state.drag.dragging) {
-        if(lastMouseDownState !== defaultLastMouseDownState) {
+        if (lastMouseDownState !== defaultLastMouseDownState) {
             const time = new Date().getTime();
             if (time - lastMouseDownState.time < 200) {
-                if(state.drag.dragging === 1) {
+                if (state.drag.dragging === 1) {
                     const event = new Event('clickTaskIcon');
                     const id = state.tasks[lastMouseDownState.index].windowId;
-                    if(id) document.getElementById(id)?.dispatchEvent(event);
+                    if (id) document.getElementById(id)?.dispatchEvent(event);
                 }
             }
         }
@@ -249,6 +249,7 @@ export const TaskManager = () => {
                     </li>
                 ))}
             </ul>
-        </>);
+        </>
+    );
 }
 

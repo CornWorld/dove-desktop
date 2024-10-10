@@ -12,28 +12,29 @@ const Kickoff = ({open, setOpen}: KickoffProps) => {
     useEffect(() => {
         const handleClickOutside = (e: Event) => {
             const kickoff = ref.current;
-            if(kickoff && !kickoff.contains(e.target as Node)) {
+            if (kickoff && !kickoff.contains(e.target as Node)) {
                 // make the app launcher button not close the kickoff
                 const kickoffButton = document.querySelector('.app-launcher');
-                if(!kickoffButton || !kickoffButton.contains(e.target as Node)) {
+                if (!kickoffButton || !kickoffButton.contains(e.target as Node)) {
                     setOpen(false);
                 }
             }
         }
 
-        if(open) addEventListener('mousedown', handleClickOutside, {capture: true});
+        if (open) addEventListener('mousedown', handleClickOutside, {capture: true});
         return () => {
-            if(open) removeEventListener('mousedown', handleClickOutside, {capture: true});
+            if (open) removeEventListener('mousedown', handleClickOutside, {capture: true});
         }
     }, [open, setOpen]);
 
     const leftWidth = 240;
-    const selections :SidebarSelection[]= [{
-        name: '', nodes:[
+    const selections: SidebarSelection[] = [{
+        name: '', nodes: [
             createSidebarNode('Favorites', 'actions/bookmarks.svg', []),
             createSidebarNode('All Applications', 'categories/applications-all.svg', []),
-        ]}, {
-        name: 'Categories', nodes:[
+        ]
+    }, {
+        name: 'Categories', nodes: [
             // Development, Graphics, Internet, Multimedia, Engineering, Games, Office, Eduction, Settings, System, Utilities, Help
             createSidebarNode('Development', 'categories/applications-development.svg', []),
             createSidebarNode('Graphics', 'categories/applications-graphics.svg', []),
@@ -47,20 +48,22 @@ const Kickoff = ({open, setOpen}: KickoffProps) => {
             createSidebarNode('System', 'categories/applications-system.svg', []),
             createSidebarNode('Utilities', 'categories/applications-utilities.svg', []),
             createSidebarNode('Help', 'apps/system-help.svg', []),
-        ]},
+        ]
+    },
     ]
     const appSelections: SidebarSelection[] = [{
         name: 'A', nodes: [
             createSidebarNode('Ark', 'apps/ark.svg'),
-        ]},
+        ]
+    },
     ];
 
     return <div className={'kickoff' + (open ? ' open' : '')} ref={ref} tabIndex={-1}
-        onBlur={() => setOpen(false)} css={{'--left-width': leftWidth+'px'}}
+                onBlur={() => setOpen(false)} css={{'--left-width': leftWidth + 'px'}}
     >
         <div className={'headerbar'}>
             <div className={'user'}>
-                <span />
+                <span/>
                 <span>CornWorld</span>
             </div>
             <div css={{
@@ -72,14 +75,14 @@ const Kickoff = ({open, setOpen}: KickoffProps) => {
                     <span className={'icon icon-search'}/>
                     <input type={'text'} placeholder={'Search'}/>
                 </div>
-                <button className={'configure'} />
-                <button className={'pin'} />
+                <button className={'configure'}/>
+                <button className={'pin'}/>
             </div>
         </div>
         <div className={'content'}>
-            <Sidebar width={leftWidth} selections={selections} />
+            <Sidebar width={leftWidth} selections={selections}/>
             <div className={'icons'}>
-                <Sidebar selections={appSelections} />
+                <Sidebar selections={appSelections}/>
             </div>
         </div>
         <div className={'footerbar'}>

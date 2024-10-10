@@ -10,7 +10,7 @@
   overflow-y: auto;
   box-sizing: border-box;
 
-  >* {
+  > * {
     border: none;
   }
 
@@ -40,6 +40,7 @@
       opacity: 0.45;
     }
   }
+
   .item {
     background-color: $colors-view-background-normal;
     margin: 2px 0;
@@ -51,6 +52,7 @@
     span:has(.icon) {
       padding-left: 20px;
     }
+
     .icon {
       width: 22px;
       height: 22px;
@@ -61,6 +63,7 @@
       display: inline-block;
       background-image: var(--icon);
     }
+
     &.link {
       &:after {
         content: "";
