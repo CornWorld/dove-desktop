@@ -78,7 +78,7 @@ const iconSearchPlace = (x: number, y: number) => {
 
     for (let i = 0; i < screen.width; i += IconWidth + IconMargin) {
         for (let j = 0; j < screen.height - 44; j += IconHeight + IconMargin) {
-            if (getIconIndexByPos(i, j) === -1) {
+            if ((i === x && j === y) || getIconIndexByPos(i, j) === -1) {
                 positions.push({x: i, y: j});
             }
         }
@@ -143,7 +143,7 @@ const onMouseUp = () => {
 
         state.drag.stopDrag();
 
-        if (resIndex === -1) {
+        if (resIndex === -1 || resIndex === index) {
             state.setIconPos(index, snappedX, snappedY);
         } else {
             const p = iconSearchPlace(x, y);
@@ -217,7 +217,7 @@ export const Workspace = () => {
                     alignItems: 'center',
                     position: 'absolute',
                     boxSizing: 'border-box',
-                    zIndex: '2',
+                    zIndex: state.drag.dragging -1 === index? '3': '2',
                 }} style={{
                     left: icon.x, top: icon.y,
                     outline: icon.selected ? '1px solid rgb(61, 174, 233)' : '0',
