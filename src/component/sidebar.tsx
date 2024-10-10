@@ -24,14 +24,14 @@ const getIcon = (icon: string) => {
 }
 
 interface SidebarProps {
-	width: number;
+	width?: number;
 	selections: SidebarSelection[];
 	
 	onSelect?: (node: SidebarNode) => void;
 }
 
 export const Sidebar = ({width, selections}:SidebarProps) => {
-	return <div className={'sidebar'} css={{'--width': (width) + 'px'}}>
+	return <div className={'sidebar'} css={{'--width': width ? (width) + 'px' : '100%'}}>
 		{selections.map((selection, index) => (
 			<div key={index} className={'selection'}>
 				<div className={'name'}>{selection.name}</div>

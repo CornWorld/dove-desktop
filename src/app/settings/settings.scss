@@ -7,34 +7,6 @@
       background: url(/public/icons/actions/go-home.svg) no-repeat center;
       background-size: 22px;
     }
-    .search {
-      position: relative;
-      display: flex;
-      align-items: center;
-
-      .icon-search {
-        position: absolute;
-        left: 8px;
-
-        background: url('/public/icons/actions/system-search.svg') no-repeat center;
-        background-size: 16px;
-        width: 18px;
-        height: 18px;
-      }
-
-      input {
-        height: 32px;
-        width: 190px;
-        padding-left: 28px;
-        border: $borders 1px solid;
-        border-radius: 1.25mm;
-        box-sizing: border-box;
-        &:focus {
-          outline: none;
-          border-color: $theme_selected_bg_color;
-        }
-      }
-    }
 
     .actions {
       background: url(/public/icons/actions/application-menu.svg) no-repeat center;

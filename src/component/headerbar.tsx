@@ -14,7 +14,7 @@ export const Headerbar = forwardRef((_, ref) => {
 		<button className={'home'} />
 		<div className={'search'}>
 			<span className={'icon icon-search'} />
-			<input type={'text'} placeholder={'Search'} />
+			<input type={'text'} placeholder={'Search'} css={{width: '190px'}} />
 		</div>
 		<button className={'actions'}></button>
 		<div className={'divider'} ref={headerbarDividerRef} />
