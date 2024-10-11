@@ -25,35 +25,37 @@ interface TaskManagerState {
     setWindowId: (index: number, windowId: string | null) => void;
 }
 
+const tasks: Task[] = [{
+    title: 'System Settings',
+    description: 'Configuration tools for your computer',
+    icon: '/icons/apps/systemsettings.svg',
+    windowId: 'window1',
+    isWindow: true,
+    active: true,
+    tooltipVisible: false,
+    x: 0,
+}, {
+    title: 'Ark',
+    description: 'Achieving Tool',
+    icon: '/icons/apps/ark.svg',
+    windowId: 'window2',
+    isWindow: true,
+    active: false,
+    tooltipVisible: false,
+    x: 0,
+}, {
+    title: 'Kate',
+    description: 'Advanced Text Editor',
+    icon: '/icons/apps/kate.svg',
+    isWindow: false,
+    windowId: null,
+    active: false,
+    tooltipVisible: false,
+    x: 0,
+}];
+
 export const taskManagerStore = create<TaskManagerState>((set) => ({
-    tasks: [{
-        title: 'System Settings',
-        description: 'Configuration tools for your computer',
-        icon: '/icons/apps/systemsettings.svg',
-        windowId: 'window1',
-        isWindow: true,
-        active: true,
-        tooltipVisible: false,
-        x: 0,
-    }, {
-        title: 'Ark',
-        description: 'Achieving Tool',
-        icon: '/icons/apps/ark.svg',
-        windowId: 'window2',
-        isWindow: true,
-        active: false,
-        tooltipVisible: false,
-        x: 0,
-    }, {
-        title: 'Kate',
-        description: 'Advanced Text Editor',
-        icon: '/icons/apps/kate.svg',
-        isWindow: false,
-        windowId: null,
-        active: false,
-        tooltipVisible: false,
-        x: 0,
-    }],
+    tasks: tasks,
     drag: createDragState(set),
     setTaskTooltipVisible: (index, visible) =>
         set((state) =>

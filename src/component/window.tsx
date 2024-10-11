@@ -69,7 +69,7 @@ const rePos = (state: WindowState, x: number, y: number) => {
 }
 
 export const createWindowStore = (state: WindowState) => {
-    const store = create<WindowStore>((set) => ({
+    return create<WindowStore>((set, get) => ({
         ...state,
         originInfo: {
             x: state.x, y: state.y, width: state.width, height: state.height,
@@ -81,14 +81,14 @@ export const createWindowStore = (state: WindowState) => {
 
         drag: createDragState(set),
         maximize: () => {
-            const state = store.getState();
+            const state = get();
             state.setStatus('maximized');
             const screen = screenStore.getState().Screen;
             state.setPos(0, 0);
             state.setSize(screen.width, screen.height);
         },
         minimize: () => {
-            const state = store.getState();
+            const state = get();
             state.setStatus('minimized');
             state.setPos(0, screenStore.getState().Screen.height + 100);
         },
@@ -97,7 +97,7 @@ export const createWindowStore = (state: WindowState) => {
             taskManagerStore.getState().setWindowId(0, null);
         },
         onClickTaskIcon: () => {
-            const state = store.getState();
+            const state = get();
             if (state.status === 'minimized' && state.originInfo) {
                 state.setStatus('normal');
                 state.setPos(state.originInfo.x, state.originInfo.y);
@@ -107,7 +107,7 @@ export const createWindowStore = (state: WindowState) => {
             }
         },
         onMouseDown: (e) => {
-            const state = store.getState();
+            const state = get();
             e.preventDefault();
             e.stopPropagation();
             const ele = e.target as HTMLElement;
@@ -117,14 +117,14 @@ export const createWindowStore = (state: WindowState) => {
             window.addEventListener('mouseup', state.onMouseUp);
         },
         onMouseMove: (e) => {
-            const state = store.getState();
+            const state = get();
             const newX = e.clientX - state.drag.offsetX;
             const newY = e.clientY - state.drag.offsetY;
             const {x, y} = rePos(state, newX, newY);
-            store.getState().setPos(x, y);
+            state.setPos(x, y);
         },
         onMouseUp: () => {
-            const state = store.getState();
+            const state = get();
             if (state.drag.dragging) {
                 window.removeEventListener('mousemove', state.onMouseMove);
                 window.removeEventListener('mouseup', state.onMouseUp);
@@ -132,7 +132,7 @@ export const createWindowStore = (state: WindowState) => {
             }
         },
         onDBClick: () => {
-            const state = store.getState();
+            const state = get();
             if (state.status === 'maximized' && state.originInfo) {
                 state.setStatus('normal');
                 state.setPos(state.originInfo.x, state.originInfo.y);
@@ -142,7 +142,6 @@ export const createWindowStore = (state: WindowState) => {
             }
         },
     }));
-    return store;
 }
 
 export const CreateWindow = (
