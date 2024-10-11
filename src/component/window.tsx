@@ -2,10 +2,10 @@ import {create, StoreApi, UseBoundStore} from "zustand";
 import {screenStore} from "../screen.tsx";
 import {createDragState, DraggableState} from "../utils/drag.ts";
 import {useLayoutEffect} from "react";
-import {workspaceStore} from "../workspace";
 import {taskManagerStore} from "../workspace/taskmanager.tsx";
 
 import './window.scss';
+import { workspaceStore } from "../workspace/store.tsx";
 
 export interface WindowState {
     title: string;
@@ -26,16 +26,18 @@ export interface WindowState {
         height: number;
     }
 }
-
-export interface WindowStore extends WindowState {
+export interface WindowHandler {
+    maximize: () => void;
+    minimize: () => void;
+    close: () => void;
+    
     setPos: (x: number, y: number) => void;
     setSize: (width: number, height: number) => void;
     setStatus: (status: string) => void;
     setActive: (a: boolean) => void;
+}
 
-    maximize: () => void;
-    minimize: () => void;
-    close: () => void;
+export interface WindowStore extends WindowState, WindowHandler {
     onClickTaskIcon: () => void;
     onMouseDown: (e: MouseEvent) => void;
     onMouseMove: (e: MouseEvent) => void;

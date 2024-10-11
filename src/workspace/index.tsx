@@ -1,65 +1,12 @@
-import {create} from "zustand/react";
-import {produce} from "immer";
-import {createDragState, DraggableState} from "../utils/drag.ts";
-import {useEffect} from "react";
-import {screenStore} from "../screen.tsx";
-import {TaskManager} from "./taskmanager.tsx";
-import {AppLauncher} from "./app-launcher.tsx";
-import {DigitalClock} from "./digital-clock.tsx";
+import { useEffect } from "react";
+import { screenStore } from "../screen.tsx";
+import { TaskManager } from "./taskmanager.tsx";
+import { AppLauncher } from "./app-launcher.tsx";
+import { DigitalClock } from "./digital-clock.tsx";
 import './index.scss';
+import { workspaceStore } from "./store.tsx";
+import { _Icon } from "./icon.tsx";
 
-interface Icon {
-    title: string;
-    icon: string;
-    selected: boolean;
-
-    x: number,
-    y: number;
-}
-
-const createIcon = (title: string, icon: string): Icon => ({
-    title, icon, selected: false,
-    x: 0, y: 0,
-});
-
-const exampleIcons: Icon[] = [
-    createIcon('Home', '/icons/places/folder-activities.svg'),
-    createIcon('Trash', '/icons/places/user-trash.svg'),
-]
-
-interface WorkspaceState {
-    icons: Icon[];
-    selectIcon: (index: number, setTo?: boolean) => void,
-    setIconPos: (index: number, x: number, y: number) => void,
-    cancelSelection: () => void,
-
-    panelFloat: boolean;
-    setPanelFloat: (float: boolean) => void;
-
-    drag: DraggableState;
-}
-
-export const workspaceStore = create<WorkspaceState>((set) => ({
-    icons: exampleIcons,
-    setIconPos: (index, x, y) => set((state) =>
-        produce(state, (draft) => {
-            draft.icons[index].x = x;
-            draft.icons[index].y = y;
-        })),
-    selectIcon: (index, setTo) => set((state) =>
-        produce(state, (draft) => {
-            draft.icons[index].selected = setTo ?? !draft.icons[index].selected;
-        })),
-    cancelSelection: () => set((state) =>
-        produce(state, (draft) => {
-            draft.icons.forEach((icon) => icon.selected = false);
-        })),
-
-    panelFloat: false,
-    setPanelFloat: (float) => set(() => ({panelFloat: float})),
-
-    drag: createDragState(set),
-}));
 
 const IconWidth = 103;
 const IconHeight = 93;
@@ -209,36 +156,7 @@ export const Workspace = () => {
             zIndex: 1,
         }} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
             {state.icons.map((icon, index) => (
-                <div key={index} css={{
-                    borderRadius: '5px',
-                    width: '103px',
-                    height: '93px',
-                    margin: '5px',
-                    padding: '5px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    boxSizing: 'border-box',
-                    zIndex: state.drag.dragging - 1 === index ? '3' : '2',
-                }} style={{
-                    left: icon.x, top: icon.y,
-                    outline: icon.selected ? '1px solid rgb(61, 174, 233)' : '0',
-                    backgroundColor: icon.selected ? 'rgba(61, 174, 233, 0.2)' : 'transparent',
-                }}>
-                    <img src={icon.icon} alt={icon.title} css={{
-                        width: '64px',
-                        margin: 'auto',
-                        height: '64px',
-                        cursor: 'pointer',
-                    }} data-index={index}/>
-                    <span css={{
-                        color: 'white',
-                        fontSize: '13px',
-                        fontWeight: 'medium',
-                    }}>awa</span>
-                </div>
+                <_Icon key={index} index={index} icon={icon} isDragging={state.drag.dragging -1 === index}/>
             ))}
         </div>
     </>
