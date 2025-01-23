@@ -1,6 +1,6 @@
 import {produce} from "immer";
 import {StateCreator} from "zustand";
-import {screenStore} from "../screen.tsx";
+import {displayStore} from "../display.tsx";
 import {workspaceStore} from "./store.tsx";
 
 interface Icon {
@@ -140,7 +140,7 @@ export const placeIcon = (index: number, x: number, y: number) => {
     }
 }
 const findAvailablePlace = (index: number, x: number, y: number) => {
-    const screen = screenStore.getState().Screen;
+    const screen = displayStore.getState().Display;
     const state = workspaceStore.getState();
     const {col, row} = state.icons[index];
     const positions = [];

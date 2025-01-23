@@ -1,5 +1,5 @@
 import {create, StoreApi, UseBoundStore} from "zustand";
-import {screenStore} from "../screen.tsx";
+import {displayStore} from "../display.tsx";
 import {createDragState, DraggableState} from "../utils/drag.ts";
 import {useLayoutEffect} from "react";
 import {taskManagerStore} from "../workspace/taskmanager.tsx";
@@ -48,7 +48,7 @@ export interface WindowStore extends WindowState, WindowHandler {
 }
 
 const rePos = (state: WindowState, x: number, y: number) => {
-    const screen = screenStore.getState().Screen;
+    const screen = displayStore.getState().Display;
     if (x < 0) {
         x = 0;
     } else if (x + state.width > screen.width) {
@@ -85,14 +85,14 @@ export const createWindowStore = (state: WindowState) => {
         maximize: () => {
             const state = get();
             state.setStatus('maximized');
-            const screen = screenStore.getState().Screen;
+            const screen = displayStore.getState().Display;
             state.setPos(0, 0);
             state.setSize(screen.width, screen.height);
         },
         minimize: () => {
             const state = get();
             state.setStatus('minimized');
-            state.setPos(0, screenStore.getState().Screen.height + 100);
+            state.setPos(0, displayStore.getState().Display.height + 100);
         },
         close: () => {
             document.getElementById(state.id)?.remove();

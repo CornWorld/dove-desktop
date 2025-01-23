@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import {screenStore} from "../screen.tsx";
+import {displayStore} from "../display.tsx";
 import {TaskManager} from "./taskmanager.tsx";
 import {AppLauncher} from "./app-launcher.tsx";
 import {DigitalClock} from "./digital-clock.tsx";
@@ -19,7 +19,7 @@ const onMouseMove = (e: MouseEvent) => {
         state.selectIcon(index, true);
 
         // check if the icon is out of bounds
-        const screen = screenStore.getState().Screen;
+        const screen = displayStore.getState().Display;
         if (newX < 0) {
             newX = 0;
         } else if (newX + IconWidth > screen.width) {
@@ -71,7 +71,7 @@ export const Workspace = () => {
     const state = workspaceStore((s) => s);
     useEffect(() => {
         const state = workspaceStore.getState();
-        const screen = screenStore.getState().Screen;
+        const screen = displayStore.getState().Display;
         for (let i = 1; i < state.icons.length; i++) {
             let newX = state.icons[i - 1].x, newY = state.icons[i - 1].y + 93 + IconMargin
             let col = state.icons[i - 1].col, row = state.icons[i - 1].row + 1;

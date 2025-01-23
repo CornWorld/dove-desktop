@@ -3,8 +3,8 @@ import {Suspense} from "react";
 import {create} from "zustand/react";
 import {Settings} from "./app/settings";
 
-interface ScreenState {
-    Screen: {
+interface DisplayState {
+    Display: {
         width: number;
         height: number;
         backgroundImage?: string;
@@ -13,17 +13,17 @@ interface ScreenState {
     resize: (width: number, height: number) => void;
 }
 
-export const screenStore = create<ScreenState>((set) => ({
-    Screen: {
+export const displayStore = create<DisplayState>((set) => ({
+    Display: {
         width: 1024,
         height: 768,
         backgroundImage: '/wallpapers/light/1024x768.png',
     },
-    resize: (width, height) => set((s) => ({Screen: {...s.Screen, width, height}})),
+    resize: (width, height) => set((s) => ({Display: {...s.Display, width, height}})),
 }))
 
-export const Screen = () => {
-    const state = screenStore((s) => s.Screen);
+export const Display = () => {
+    const state = displayStore((s) => s.Display);
     return <div css={{
         minHeight: state.height,
         minWidth: state.width,
@@ -33,7 +33,7 @@ export const Screen = () => {
         border: '0.1px solid black',
         perspective: '1000px',
         // overflow: 'hidden',
-    }} id={'screen'}>
+    }} id={'display'}>
         <Suspense fallback={<></>}>
             {/* TODO Loading screen*/}
             <Workspace/>
