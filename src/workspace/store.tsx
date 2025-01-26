@@ -1,36 +1,56 @@
-import { createDragState, DraggableState } from "../utils/drag.ts";
-import { IconStore, createIconStore } from "./icon.tsx";
-import { create, StateCreator } from "zustand";
-import { WindowState, WindowHandler } from "../component/window.tsx";
-
+import { createDragState, DragState } from "../utils/drag";
+import { IconStore, createIconStore } from "./icon";
+import { createStore } from "solid-js/store";
+import { WindowState, WindowHandler } from "../component/window";
 
 type Window = WindowState & WindowHandler;
+
 interface WindowManagerStore {
 	window: Window[];
 	addWindow: (window: WindowState & WindowHandler) => void;
 	removeWindow: (id: string) => void;
 }
 
-const createWindowManagerStore:StateCreator<WindowManagerStore, [], [], WindowManagerStore> = (set) => ({
-	window: [],
-	addWindow: (window) => set((state) => ({window: [...state.window, window]})),
-	removeWindow: (id) => set((state) => ({window: state.window.filter((w) => w.id !== id)})),
-});
+function createWindowManagerStore() {
+	const [state, setState] = createStore<WindowManagerStore>({
+		window: [],
+		addWindow: (window) => setState('window', (prev) => [...prev, window]),
+		removeWindow: (id) => setState('window', (prev) => prev.filter((w) => w.id !== id))
+	});
+	return state;
+}
 
 interface WorkspaceState extends IconStore, WindowManagerStore {
 	// TODO move to panel store
 	panelFloat: boolean;
 	setPanelFloat: (float: boolean) => void;
 	
-	drag: DraggableState;
+	iconDrag: DragState;
+	windowDrag: DragState;
 }
 
-export const workspaceStore = create<WorkspaceState>((set, get, api) => ({
-	...createIconStore(set, get, api),
-	...createWindowManagerStore(set, get, api),
+const emptyDragState: DragState = {
+	offsetX: 0,
+	offsetY: 0,
+	dragging: 0
+};
+
+const [workspaceState, setWorkspaceState] = createStore<WorkspaceState>({
+	...createIconStore(),
+	...createWindowManagerStore(),
 	
 	panelFloat: false,
-	setPanelFloat: (float) => set(() => ({panelFloat: float})),
+	setPanelFloat: (float) => setWorkspaceState('panelFloat', float),
 	
-	drag: createDragState(set),
-}));
+	iconDrag: emptyDragState,
+	windowDrag: emptyDragState
+});
+
+// Initialize drags after store creation since they need the setter
+const iconDrag = createDragState(setWorkspaceState, 'iconDrag');
+const windowDrag = createDragState(setWorkspaceState, 'windowDrag');
+
+setWorkspaceState('iconDrag', iconDrag);
+setWorkspaceState('windowDrag', windowDrag);
+
+export { workspaceState, setWorkspaceState };

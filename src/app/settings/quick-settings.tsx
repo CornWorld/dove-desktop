@@ -5,10 +5,10 @@ export const QuickSettings = () => {
             <select onChange={(e) => {
                 const theme = e.target.value;
                 document.documentElement.setAttribute('data-theme', theme);
-            }} css={{
-                marginLeft: '10px',
+            }} style={{
+                "margin-left": '10px',
                 padding: '5px',
-                borderRadius: '5px',
+                "border-radius": '5px',
                 border: '1px solid rgba(0, 0, 0, 0.1)',
             }}>
                 <option value="light">Light</option>
@@ -18,14 +18,14 @@ export const QuickSettings = () => {
         <div>
             <span>Animation speed</span>
         </div>
-        <div css={{
+        <div style={{
             display: 'flex',
-            flexDirection: 'row',
+            "flex-direction": 'row',
         }}>
             <button>Change Wallpaper...</button>
             <button>More Appearance Settings...</button>
         </div>
-        <div className={'divider'}/>
+        <div class="divider"/>
         <div>
             <span>Clicking files or folders</span>
         </div>

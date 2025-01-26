@@ -1,11 +1,11 @@
-import {create, StoreApi, UseBoundStore} from "zustand";
-import {displayStore} from "../display.tsx";
-import {createDragState, DraggableState} from "../utils/drag.ts";
-import {useLayoutEffect} from "react";
-import {taskManagerStore} from "../workspace/taskmanager.tsx";
+import { createStore, produce } from "solid-js/store";
+import { onMount, onCleanup, Component, JSX } from "solid-js";
+import { displayState } from "@/display";
+import { createDragState, DragState } from "@/utils/drag";
+import { setWorkspaceState } from "@/workspace/store";
+import { setTaskWindowId } from "@/workspace/taskmanager";
 
 import './window.scss';
-import { workspaceStore } from "../workspace/store.tsx";
 
 export interface WindowState {
     title: string;
@@ -26,11 +26,11 @@ export interface WindowState {
         height: number;
     }
 }
+
 export interface WindowHandler {
     maximize: () => void;
     minimize: () => void;
     close: () => void;
-    
     setPos: (x: number, y: number) => void;
     setSize: (width: number, height: number) => void;
     setStatus: (status: string) => void;
@@ -43,12 +43,16 @@ export interface WindowStore extends WindowState, WindowHandler {
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: (e: MouseEvent) => void;
     onDBClick: (e: MouseEvent) => void;
+    drag: DragState;
+}
 
-    drag: DraggableState;
+interface DraggableState extends DragState {
+    startDrag: (offsetX: number, offsetY: number, dragging?: number) => void;
+    stopDrag: () => void;
 }
 
 const rePos = (state: WindowState, x: number, y: number) => {
-    const screen = displayStore.getState().Display;
+    const screen = displayState;
     if (x < 0) {
         x = 0;
     } else if (x + state.width > screen.width) {
@@ -61,138 +65,174 @@ const rePos = (state: WindowState, x: number, y: number) => {
     }
 
     // check window's position. if it's too close to the edge, float the panel
-    const workspace = workspaceStore.getState();
     if (screen.height - y - state.height < 44 + 7) {
-        workspace.setPanelFloat(false);
+        setWorkspaceState('panelFloat', false);
     } else {
-        workspace.setPanelFloat(true);
+        setWorkspaceState('panelFloat', true);
     }
     return {x, y};
-}
+};
 
-export const createWindowStore = (state: WindowState) => {
-    return create<WindowStore>((set, get) => ({
-        ...state,
+export const createWindowStore = (initialState: WindowState) => {
+    // Initialize with empty drag state first
+    const emptyDragState: DraggableState = {
+        offsetX: 0,
+        offsetY: 0,
+        dragging: 0,
+        startDrag: () => {},
+        stopDrag: () => {}
+    };
+
+    const [state, setState] = createStore<WindowStore>({
+        ...initialState,
         originInfo: {
-            x: state.x, y: state.y, width: state.width, height: state.height,
+            x: initialState.x,
+            y: initialState.y,
+            width: initialState.width,
+            height: initialState.height,
         },
-        setPos: (x, y) => set({x, y}),
-        setSize: (width, height) => set({width, height}),
-        setStatus: (status) => set({status}),
-        setActive: (active) => set({active: active}),
-
-        drag: createDragState(set),
+        drag: emptyDragState,
+        setPos: (x: number, y: number) => setState(produce((s) => { s.x = x; s.y = y; })),
+        setSize: (width: number, height: number) => setState(produce((s) => { s.width = width; s.height = height; })),
+        setStatus: (status: string) => setState(produce((s) => { s.status = status; })),
+        setActive: (active: boolean) => setState(produce((s) => { s.active = active; })),
         maximize: () => {
-            const state = get();
-            state.setStatus('maximized');
-            const screen = displayStore.getState().Display;
-            state.setPos(0, 0);
-            state.setSize(screen.width, screen.height);
+            setState(produce((s) => {
+                s.status = 'maximized';
+                s.x = 0;
+                s.y = 0;
+                s.width = displayState.width;
+                s.height = displayState.height;
+            }));
         },
         minimize: () => {
-            const state = get();
-            state.setStatus('minimized');
-            state.setPos(0, displayStore.getState().Display.height + 100);
+            setState(produce((s) => {
+                s.status = 'minimized';
+                s.x = 0;
+                s.y = displayState.height + 100;
+            }));
         },
         close: () => {
             document.getElementById(state.id)?.remove();
-            taskManagerStore.getState().setWindowId(0, null);
+            setTaskWindowId(0, null);
         },
         onClickTaskIcon: () => {
-            const state = get();
             if (state.status === 'minimized' && state.originInfo) {
-                state.setStatus('normal');
-                state.setPos(state.originInfo.x, state.originInfo.y);
-                state.setSize(state.originInfo.width, state.originInfo.height);
+                setState(produce((s) => {
+                    s.status = 'normal';
+                    s.x = state.originInfo!.x;
+                    s.y = state.originInfo!.y;
+                    s.width = state.originInfo!.width;
+                    s.height = state.originInfo!.height;
+                }));
             } else if (state.status === 'normal') {
                 state.minimize();
             }
         },
-        onMouseDown: (e) => {
-            const state = get();
-            e.preventDefault();
-            e.stopPropagation();
+        onMouseDown: (e: MouseEvent) => {
             const ele = e.target as HTMLElement;
-            if (ele && ele.tagName === 'BUTTON' || ele.tagName === 'INPUT') return;
-            state.drag.startDrag(e.clientX - state.x, e.clientY - state.y);
-            window.addEventListener('mousemove', state.onMouseMove);
-            window.addEventListener('mouseup', state.onMouseUp);
+            // Only prevent events when clicking the titlebar
+            if (ele.closest('.titlebar')) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (ele.tagName === 'BUTTON' || ele.tagName === 'INPUT') return;
+                (state.drag as DraggableState).startDrag(e.clientX - state.x, e.clientY - state.y);
+                window.addEventListener('mousemove', state.onMouseMove);
+                window.addEventListener('mouseup', state.onMouseUp);
+            }
         },
-        onMouseMove: (e) => {
-            const state = get();
+        onMouseMove: (e: MouseEvent) => {
             const newX = e.clientX - state.drag.offsetX;
             const newY = e.clientY - state.drag.offsetY;
             const {x, y} = rePos(state, newX, newY);
             state.setPos(x, y);
         },
         onMouseUp: () => {
-            const state = get();
             if (state.drag.dragging) {
                 window.removeEventListener('mousemove', state.onMouseMove);
                 window.removeEventListener('mouseup', state.onMouseUp);
-                state.drag.stopDrag();
+                (state.drag as DraggableState).stopDrag();
             }
         },
         onDBClick: () => {
-            const state = get();
             if (state.status === 'maximized' && state.originInfo) {
-                state.setStatus('normal');
-                state.setPos(state.originInfo.x, state.originInfo.y);
-                state.setSize(state.originInfo.width, state.originInfo.height);
+                setState(produce((s) => {
+                    s.status = 'normal';
+                    s.x = state.originInfo!.x;
+                    s.y = state.originInfo!.y;
+                    s.width = state.originInfo!.width;
+                    s.height = state.originInfo!.height;
+                }));
             } else {
                 state.maximize();
             }
         },
-    }));
+    });
+
+    // Initialize real drag state after store creation
+    setState('drag', createDragState(setState) as DraggableState);
+
+    return [state, setState] as const;
+};
+
+interface WindowProps {
+    store: ReturnType<typeof createWindowStore>[0];
+    customCss?: string[];
+    children: JSX.Element;
 }
 
-export const CreateWindow = (
-    store: UseBoundStore<StoreApi<WindowStore>>,
-    customCss: string[] = [],
-    content: JSX.Element,
-) => {
-    const state = store((s) => s);
-    const style = {
-        left: state.x + 'px',
-        top: state.y + 'px',
-        width: state.width + 'px',
-        height: state.height + 'px',
-        zIndex: state.z,
-    };
-    useLayoutEffect(() => {
-        const ele = document.getElementById(state.id);
+export const Window: Component<WindowProps> = (props) => {
+    onMount(() => {
+        const ele = document.getElementById(props.store.id);
         if (ele) {
-            ele.addEventListener('clickTaskIcon', state.onClickTaskIcon);
-            ele.addEventListener('dblclick', state.onDBClick);
+            ele.addEventListener('clickTaskIcon', props.store.onClickTaskIcon);
+            ele.addEventListener('dblclick', props.store.onDBClick);
         }
-        state.setPos(state.x, state.y);
+        props.store.setPos(props.store.x, props.store.y);
 
-        return () => {
+        onCleanup(() => {
             if (ele) {
-                ele.removeEventListener('clickTaskIcon', state.onClickTaskIcon);
-                ele.removeEventListener('dblclick', state.onDBClick);
+                ele.removeEventListener('clickTaskIcon', props.store.onClickTaskIcon);
+                ele.removeEventListener('dblclick', props.store.onDBClick);
             }
-        }
-    }, []);
+        });
+    });
 
-    return <div className={'window'} style={style} id={state.id}>
-        <div className={'titlebar'}
-             onMouseDown={(e) => {
-                 state.onMouseDown(e as unknown as MouseEvent)
-             }}
+    return (
+        <div 
+            class="window" 
+            style={{
+                left: `${props.store.x}px`,
+                top: `${props.store.y}px`,
+                width: `${props.store.width}px`,
+                height: `${props.store.height}px`,
+                "z-index": props.store.z,
+                "pointer-events": props.store.status === 'minimized' ? 'none' : 'auto',
+                visibility: props.store.status === 'minimized' ? 'hidden' : 'visible'
+            }} 
+            id={props.store.id}
         >
-            <div className={'windowcontrols left'}>
-                <button className={'window-icon'}
-                        css={{'--window-icon': 'url(' + state.icon + ')'}}/>
-                <button className={'pin'}/>
+            <div 
+                class="titlebar"
+                onMouseDown={(e) => props.store.onMouseDown(e)}
+            >
+                <div class="windowcontrols left">
+                    <button 
+                        class="window-icon"
+                        style={{ "--window-icon": `url(${props.store.icon})` }}
+                    />
+                    <button class="pin"/>
+                </div>
+                <div><label>{props.store.title}</label></div>
+                <div class="windowcontrols right">
+                    <button class="minimize" onClick={() => props.store.minimize()}/>
+                    <button class="maximize" onClick={() => props.store.maximize()}/>
+                    <button class="close" onClick={() => props.store.close()}/>
+                </div>
             </div>
-            <div><label>{state.title}</label></div>
-            <div className={'windowcontrols right'}>
-                <button className={'minimize'} onClick={state.minimize}/>
-                <button className={'maximize'} onClick={state.maximize}/>
-                <button className={'close'} onClick={state.close}/>
+            <div class={['content', ...(props.customCss || [])].join(' ')}>
+                {props.children}
             </div>
         </div>
-        <div className={['content', ...customCss].join(' ')}>{content}</div>
-    </div>
-}
+    );
+};

@@ -1,3 +1,5 @@
+import type { Component } from 'solid-js';
+import { For } from 'solid-js';
 import './siderbar.scss';
 
 export interface SidebarSelection {
@@ -31,18 +33,28 @@ interface SidebarProps {
     onSelect?: (node: SidebarNode) => void;
 }
 
-export const Sidebar = ({width, selections}: SidebarProps) => {
-    return <div className={'sidebar'} css={{'--width': width ? (width) + 'px' : '100%'}}>
-        {selections.map((selection, index) => (
-            <div key={index} className={'selection'}>
-                <div className={'name'}>{selection.name}</div>
-                {selection.nodes.map((node, index) => (
-                    <div key={index} className={'item'}>
-                        <span className={'icon'} css={{'--icon': getIcon(node.icon)}}/>
-                        <span>{node.name}</span>
-                    </div>
-                ))}
-            </div>
-        ))}
+export const Sidebar: Component<SidebarProps> = (props) => {
+    return <div class="sidebar" style={{ "--width": props.width ? `${props.width}px` : '100%' }}>
+        <For each={props.selections}>
+            {(selection) => (
+                <div class="selection">
+                    <div class="name">{selection.name}</div>
+                    <For each={selection.nodes}>
+                        {(node) => (
+                            <div 
+                                class="item"
+                                onClick={() => props.onSelect?.(node)}
+                            >
+                                <span 
+                                    class="icon" 
+                                    style={{ "--icon": getIcon(node.icon) }}
+                                />
+                                <span>{node.name}</span>
+                            </div>
+                        )}
+                    </For>
+                </div>
+            )}
+        </For>
     </div>
 }

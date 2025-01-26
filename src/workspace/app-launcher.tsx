@@ -1,31 +1,33 @@
-import {useEffect, useRef, useState} from "react";
-import {DescriptionTooltip} from "../component/tooltip.tsx";
-import {createSidebarNode, Sidebar, SidebarSelection} from "../component/sidebar.tsx";
+import { createSignal, onMount, onCleanup } from "solid-js";
+import { DescriptionTooltip } from "../component/tooltip";
+import { createSidebarNode, Sidebar, SidebarSelection } from "../component/sidebar";
 
 interface KickoffProps {
     open: boolean;
     setOpen: (open: boolean) => void;
 }
 
-const Kickoff = ({open, setOpen}: KickoffProps) => {
-    const ref = useRef<HTMLDivElement>(null);
-    useEffect(() => {
+const Kickoff = (props: KickoffProps) => {
+    let ref: HTMLDivElement | undefined;
+
+    onMount(() => {
         const handleClickOutside = (e: Event) => {
-            const kickoff = ref.current;
-            if (kickoff && !kickoff.contains(e.target as Node)) {
+            if (ref && !ref.contains(e.target as Node)) {
                 // make the app launcher button not close the kickoff
                 const kickoffButton = document.querySelector('.app-launcher');
                 if (!kickoffButton || !kickoffButton.contains(e.target as Node)) {
-                    setOpen(false);
+                    props.setOpen(false);
                 }
             }
-        }
+        };
 
-        if (open) addEventListener('mousedown', handleClickOutside, {capture: true});
-        return () => {
-            if (open) removeEventListener('mousedown', handleClickOutside, {capture: true});
+        if (props.open) {
+            window.addEventListener('mousedown', handleClickOutside, { capture: true });
+            onCleanup(() => {
+                window.removeEventListener('mousedown', handleClickOutside, { capture: true });
+            });
         }
-    }, [open, setOpen]);
+    });
 
     const leftWidth = 240;
     const selections: SidebarSelection[] = [{
@@ -58,57 +60,58 @@ const Kickoff = ({open, setOpen}: KickoffProps) => {
     },
     ];
 
-    return <div className={'kickoff' + (open ? ' open' : '')} ref={ref} tabIndex={-1}
-                onBlur={() => setOpen(false)} css={{'--left-width': leftWidth + 'px'}}
+    return <div class={`kickoff${props.open ? ' open' : ''}`} ref={ref} tabIndex={-1}
+                onBlur={() => props.setOpen(false)} style={{ "--left-width": `${leftWidth}px` }}
     >
-        <div className={'headerbar'}>
-            <div className={'user'}>
+        <div class="headerbar">
+            <div class="user">
                 <span/>
                 <span>CornWorld</span>
             </div>
-            <div css={{
-                flexGrow: 1,
-                display: 'flex',
-                flexDirection: 'column',
+            <div style={{
+                "flex-grow": "1",
+                display: "flex",
+                "flex-direction": "column",
             }}>
-                <div className={'search'}>
-                    <span className={'icon icon-search'}/>
-                    <input type={'text'} placeholder={'Search'}/>
+                <div class="search">
+                    <span class="icon icon-search"/>
+                    <input type="text" placeholder="Search"/>
                 </div>
-                <button className={'configure'}/>
-                <button className={'pin'}/>
+                <button class="configure"/>
+                <button class="pin"/>
             </div>
         </div>
-        <div className={'content'}>
+        <div class="content">
             <Sidebar width={leftWidth} selections={selections}/>
-            <div className={'icons'}>
+            <div class="icons">
                 <Sidebar selections={appSelections}/>
             </div>
         </div>
-        <div className={'footerbar'}>
-
-        </div>
+        <div class="footerbar"/>
     </div>
 }
 
 export const AppLauncher = () => {
-    const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
-    const [kickoffOpen, setKickoffOpen] = useState<boolean>(false);
+    const [tooltipVisible, setTooltipVisible] = createSignal(false);
+    const [kickoffOpen, setKickoffOpen] = createSignal(false);
     return (
         <>
-            <div className={'app-launcher' + (kickoffOpen ? ' active' : '')}
+            <div class={`app-launcher${kickoffOpen() ? ' active' : ''}`}
                  onMouseEnter={() => setTooltipVisible(true)}
                  onMouseLeave={() => setTooltipVisible(false)}
                  onClick={() => {
-                     setKickoffOpen(!kickoffOpen);
+                     setKickoffOpen(!kickoffOpen());
                      setTooltipVisible(false);
                  }}
             >
-                <span className={'window-icon icon-app-launcher'}/>
-                <DescriptionTooltip visible={tooltipVisible} title={'Application Launcher'}
-                                    description={'Launcher to start applications'}/>
+                <span class="window-icon icon-app-launcher"/>
+                <DescriptionTooltip 
+                    visible={tooltipVisible()} 
+                    title="Application Launcher"
+                    description="Launcher to start applications"
+                />
             </div>
-            <Kickoff open={kickoffOpen} setOpen={setKickoffOpen}/>
+            <Kickoff open={kickoffOpen()} setOpen={setKickoffOpen}/>
         </>
     );
 }

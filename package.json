@@ -1,5 +1,4 @@
 {
-    "scss": "^0.2.4",
   "name": "dove-desktop",
   "private": true,
   "author": "CornWorld",
@@ -13,28 +12,25 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.3",
     "dayjs": "^1.11.13",
+    "eslint-plugin:8.21.0": "link:@typescript-eslint/eslint-plugin:8.21.0",
     "immer": "^10.1.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "zustand": "^5.0.0-rc.2"
+    "parser:8.21.0": "link:@typescript-eslint/parser:8.21.0",
+    "solid-js": "^1.9.4"
   },
   "devDependencies": {
-    "@emotion/babel-plugin": "^11.12.0",
-    "@eslint/js": "^9.9.0",
-    "@types/node": "^22.7.4",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react-swc": "^3.7.1",
-    "eslint": "^9.9.0",
-    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
-    "eslint-plugin-react-refresh": "^0.4.9",
-    "globals": "^15.9.0",
-    "sass": "^1.79.4",
-    "sass-embedded": "^1.79.4",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "@emotion/babel-plugin": "^11.13.5",
+    "@eslint/js": "^9.19.0",
+    "@types/node": "^22.10.10",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
+    "eslint": "^9.19.0",
+    "eslint-plugin-solid": "^0.14.5",
+    "globals": "^15.14.0",
+    "sass": "^1.83.4",
+    "sass-embedded": "^1.83.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11",
+    "vite-plugin-solid": "^2.11.0"
   }
 }

@@ -1,112 +1,120 @@
-import {useEffect} from "react";
-import {displayStore} from "../display.tsx";
-import {TaskManager} from "./taskmanager.tsx";
-import {AppLauncher} from "./app-launcher.tsx";
-import {DigitalClock} from "./digital-clock.tsx";
+import {displayState} from "../display";
+import {TaskManager} from "./taskmanager";
+import {AppLauncher} from "./app-launcher";
+import {DigitalClock} from "./digital-clock";
 import './index.scss';
-import {workspaceStore} from "./store.tsx";
-import {_Icon, IconHeight, IconMargin, IconWidth, placeIcon} from "./icon.tsx";
-
+import {workspaceState, setWorkspaceState} from "./store";
+import {Icon, IconHeight, IconMargin, IconWidth, placeIcon} from "./icon";
+import { For } from "solid-js";
+import { onMount } from "solid-js";
 
 const onMouseMove = (e: MouseEvent) => {
-    const state = workspaceStore.getState();
+    if (workspaceState.iconDrag.dragging) {
+        const index = workspaceState.iconDrag.dragging - 1;
+        let newX = e.clientX - workspaceState.iconDrag.offsetX;
+        let newY = e.clientY - workspaceState.iconDrag.offsetY;
 
-    if (state.drag.dragging) {
-        const index = state.drag.dragging - 1;
-        let newX = e.clientX - state.drag.offsetX;
-        let newY = e.clientY - state.drag.offsetY;
-
-        state.selectIcon(index, true);
+        workspaceState.selectIcon(index, true);
 
         // check if the icon is out of bounds
-        const screen = displayStore.getState().Display;
         if (newX < 0) {
             newX = 0;
-        } else if (newX + IconWidth > screen.width) {
-            newX = screen.width - IconWidth;
+        } else if (newX + IconWidth > displayState.width) {
+            newX = displayState.width - IconWidth;
         }
         if (newY < 0) {
             newY = 0;
-        } else if (newY + IconHeight > screen.height - 44) {
-            newY = screen.height - IconHeight - 44;
+        } else if (newY + IconHeight > displayState.height - 44) {
+            newY = displayState.height - IconHeight - 44;
         }
 
-        state.setIconPos(index, newX, newY);
+        workspaceState.setIconPos(index, newX, newY);
     }
 };
+
 const onMouseUp = () => {
-    const state = workspaceStore.getState();
-    if (state.drag.dragging) {
-        const index = state.drag.dragging - 1;
-        const {x, y} = state.icons[index];
+    if (workspaceState.iconDrag.dragging) {
+        const index = workspaceState.iconDrag.dragging - 1;
+        const {x, y} = workspaceState.icons[index];
 
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
 
-        state.drag.stopDrag();
-
+        setWorkspaceState('iconDrag', {
+            offsetX: 0,
+            offsetY: 0,
+            dragging: 0
+        });
         placeIcon(index, x, y);
     }
-}
+};
+
 const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     // get the icon index
     const dataIndex = (e.target as HTMLElement).getAttribute('data-index');
     if (dataIndex === null) {
-        workspaceStore.getState().cancelSelection();
+        workspaceState.cancelSelection();
     } else {
         const dragging = parseInt(dataIndex) + 1;
-        const state = workspaceStore.getState();
+        const index = dragging - 1;
+        const icon = workspaceState.icons[index];
 
-        state.selectIcon(dragging - 1);
-        const {x, y} = state.icons[dragging - 1];
-        state.drag.startDrag(e.clientX - x, e.clientY - y, dragging);
+        workspaceState.selectIcon(index, true);
+
+        setWorkspaceState('iconDrag', {
+            offsetX: e.clientX - icon.x,
+            offsetY: e.clientY - icon.y,
+            dragging
+        });
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
     }
-}
+};
 
 export const Workspace = () => {
-    const state = workspaceStore((s) => s);
-    useEffect(() => {
-        const state = workspaceStore.getState();
-        const screen = displayStore.getState().Display;
-        for (let i = 1; i < state.icons.length; i++) {
-            let newX = state.icons[i - 1].x, newY = state.icons[i - 1].y + 93 + IconMargin
-            let col = state.icons[i - 1].col, row = state.icons[i - 1].row + 1;
-            if (newY + IconHeight > screen.height - 44) {
-                if (newX + IconWidth > screen.width) {
-                    // TODO: add a more icon to the workspace
-                } else {
-                    newX += IconWidth + IconMargin;
-                    newY = 0;
-                    col += 1;
-                    row = 0;
-                }
-            }
-            state.setIconPos(i, newX, newY);
-            state.setGridPos(i, col, row);
-        }
-    }, []);
+    onMount(() => {
+        const display = document.getElementById('display');
+        if (!display) return;
 
-    return <>
-        <div className={'panel' + (state.panelFloat ? ' float' : '')}>
-            <AppLauncher/>
-            <TaskManager/>
-            <DigitalClock/>
-        </div>
-        <div css={{
-            width: '100%',
-            height: 'calc(100% - 44px)',
-            position: 'absolute',
-            userSelect: 'none',
-            zIndex: 1,
-        }} onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}>
-            {state.icons.map((icon, index) => (
-                <_Icon key={index} index={index} icon={icon} isDragging={state.drag.dragging - 1 === index}/>
-            ))}
-        </div>
-    </>
+        const rect = display.getBoundingClientRect();
+        const maxCol = Math.floor(rect.width / (IconWidth + IconMargin));
+        const maxRow = Math.floor((rect.height - 44) / (IconHeight + IconMargin));
 
+        workspaceState.icons.forEach((_, i) => {
+            const col = i % maxCol;
+            const row = Math.floor(i / maxCol);
+            if (row >= maxRow) return;
+            placeIcon(i, col * (IconWidth + IconMargin), row * (IconHeight + IconMargin));
+        });
+    });
+
+    return (
+        <>
+            <div class={`panel${workspaceState.panelFloat ? ' float' : ''}`}>
+                <AppLauncher/>
+                <TaskManager/>
+                <DigitalClock/>
+            </div>
+            <div style={{
+                width: '100%',
+                height: 'calc(100% - 44px)',
+                position: 'absolute',
+                "user-select": 'none',
+                "z-index": 1,
+                "pointer-events": "all"
+            }} onMouseDown={onMouseDown}>
+                <For each={workspaceState.icons}>
+                    {(icon, index) => (
+                        <Icon 
+                            icon={icon} 
+                            index={index()} 
+                            isDragging={workspaceState.iconDrag.dragging === index() + 1}
+                        />
+                    )}
+                </For>
+            </div>
+        </>
+    );
 }

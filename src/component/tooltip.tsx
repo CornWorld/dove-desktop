@@ -1,62 +1,72 @@
-import {PropsWithChildren, useLayoutEffect, useRef} from "react";
+import { createEffect } from "solid-js";
+import type { Component, JSX } from "solid-js";
 import '../breeze.scss';
 
-interface TooltipProps extends PropsWithChildren {
+interface TooltipProps {
+    children?: JSX.Element;
     visible: boolean;
 }
 
-export const Tooltip = ({children, visible}: TooltipProps) => {
-    const ref = useRef<HTMLDivElement>(null);
-    useLayoutEffect(() => {
-        const tooltip = ref.current;
+export const Tooltip: Component<TooltipProps> = (props) => {
+    let tooltipRef: HTMLDivElement | undefined;
+
+    createEffect(() => {
+        if (!tooltipRef) return;
+        
         const screen = document.querySelector<HTMLElement>('#screen');
-        if (tooltip && screen) {
-            const rect = tooltip.getBoundingClientRect();
+        if (screen) {
+            const rect = tooltipRef.getBoundingClientRect();
             const screenRect = screen.getBoundingClientRect();
 
             if (rect.left < screenRect.left) {
-                tooltip.style.left = '0';
+                tooltipRef.style.left = '0';
             }
             if (rect.top < screenRect.top) {
-                tooltip.style.top = '0';
+                tooltipRef.style.top = '0';
             }
             if (rect.right > screenRect.right) {
-                tooltip.style.right = (rect.right - screenRect.right) + 'px';
+                tooltipRef.style.right = (rect.right - screenRect.right) + 'px';
             }
             if (rect.bottom > screenRect.bottom) {
-                tooltip.style.bottom = (rect.bottom - screenRect.bottom) + 'px';
+                tooltipRef.style.bottom = (rect.bottom - screenRect.bottom) + 'px';
             }
         }
-    }, [visible/* Not a good way, but it works! */]);
-    return <div ref={ref} className={'tooltip background' + (visible ? ' visible' : '')}>
-        {children}
-    </div>
-}
+    });
+
+    return (
+        <div 
+            ref={tooltipRef} 
+            class={`tooltip background${props.visible ? ' visible' : ''}`}
+        >
+            {props.children}
+        </div>
+    );
+};
 
 interface DescriptionTooltipProps extends TooltipProps {
     title: string;
     description: string;
 }
 
-export const DescriptionTooltip = ({children, visible, title, description}: DescriptionTooltipProps) => {
-    return <Tooltip visible={visible}>
-        <div css={{
-            textWrap: 'nowrap',
-            'b': {
-                opacity: 1,
-                fontWeight: 'bold',
-            },
-            'p': {
-                margin: '0',
-                fontSize: '14px',
-                opacity: 0.6,
-                lineHeight: '18px',
-                fontWeight: 'normal',
-            }
-        }}>
-            <b className={'heading'}>{title}</b>
-            <p>{description}</p>
-            {children}
-        </div>
-    </Tooltip>
-}
+export const DescriptionTooltip: Component<DescriptionTooltipProps> = (props) => {
+    return (
+        <Tooltip visible={props.visible}>
+            <div style={{
+                "text-wrap": "nowrap",
+            }}>
+                <b class="heading" style={{
+                    opacity: "1",
+                    "font-weight": "bold"
+                }}>{props.title}</b>
+                <p style={{
+                    margin: "0",
+                    "font-size": "14px",
+                    opacity: "0.6",
+                    "line-height": "18px",
+                    "font-weight": "normal"
+                }}>{props.description}</p>
+                {props.children}
+            </div>
+        </Tooltip>
+    );
+};

@@ -1,48 +1,49 @@
-import {useEffect, useState} from "react";
+import { createSignal, createEffect, onCleanup, For } from "solid-js";
 import dayjs from "dayjs";
-import {Tooltip} from "../component/tooltip.tsx";
+import { Tooltip } from "../component/tooltip";
 
 export const DigitalClock = () => {
-    const [clock, setClock] = useState<string>('');
-    const [tooltipClock, setTooltipClock] = useState<string>('');
-    const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
+    const [clock, setClock] = createSignal('');
+    const [tooltipClock, setTooltipClock] = createSignal('');
+    const [tooltipVisible, setTooltipVisible] = createSignal(false);
 
-    const genEffect = (str: string, setClock: (str: string) => void, refresh = false) => {
-        return () => {
-            setClock(dayjs().format(str));
-            if (!refresh) return;
-            const interval = setInterval(() => {
-                setClock(dayjs().format(str));
-            }, 100);
-            return () => {
-                clearInterval(interval)
-            };
-        };
+    const updateClock = (str: string, setTime: (val: string) => void, refresh = false) => {
+        setTime(dayjs().format(str));
+        if (!refresh) return;
+        
+        const interval = setInterval(() => {
+            setTime(dayjs().format(str));
+        }, 100);
+        
+        onCleanup(() => clearInterval(interval));
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(genEffect('HH:mm:ss\nYYYY/MM/DD', setClock, true), []);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(genEffect('dddd\n[UTC]Z HH:mm:ss\nYYYY-MM-DD', setTooltipClock, tooltipVisible), [tooltipVisible]);
+    createEffect(() => {
+        updateClock('HH:mm:ss\nYYYY/MM/DD', setClock, true);
+    });
+
+    createEffect(() => {
+        if (tooltipVisible()) {
+            updateClock('dddd\n[UTC]Z HH:mm:ss\nYYYY-MM-DD', setTooltipClock, true);
+        }
+    });
 
     return (
-        <>
-            <div className={'digital-clock'}
-                 onMouseEnter={() => setTooltipVisible(true)}
-                 onMouseLeave={() => setTooltipVisible(false)}
-            >
-                {clock.split('\n').map((line, index) => (
-                    <span key={index}>{line}</span>
-                ))}
-                <Tooltip
-                    visible={tooltipVisible}>
-                    <div className={'digital-clock-tooltip'}>
-                        {tooltipClock.split('\n').map((line, index) => (
-                            <span key={index}>{line}</span>
-                        ))}
-                    </div>
-                </Tooltip>
-            </div>
-        </>
+        <div class="digital-clock"
+             onMouseEnter={() => setTooltipVisible(true)}
+             onMouseLeave={() => setTooltipVisible(false)}
+        >
+            <For each={clock().split('\n')}>
+                {(line) => <span>{line}</span>}
+            </For>
+            <Tooltip
+                visible={tooltipVisible()}>
+                <div class="digital-clock-tooltip">
+                    <For each={tooltipClock().split('\n')}>
+                        {(line) => <span>{line}</span>}
+                    </For>
+                </div>
+            </Tooltip>
+        </div>
     );
-}
+};

@@ -1,8 +1,7 @@
-import {create} from "zustand/react";
-import {DescriptionTooltip} from "../component/tooltip.tsx";
-import {produce} from "immer";
-import {useEffect} from "react";
-import {createDragState, DraggableState} from "../utils/drag.ts";
+import { createStore, produce } from "solid-js/store";
+import { onMount, For } from "solid-js";
+import { DescriptionTooltip } from "../component/tooltip";
+import { DragState } from "../utils/drag";
 
 interface Task {
     title: string;
@@ -16,16 +15,11 @@ interface Task {
 }
 
 interface TaskManagerState {
-    tasks: Task[],
-    drag: DraggableState,
-    setTaskTooltipVisible: (index: number, visible: boolean) => void;
-    setTaskPosition: (index: number, x: number) => void;
-    swapTaskPosition: (index1: number, index2: number) => void;
-    setTaskActive: (index: number, active: boolean) => void;
-    setWindowId: (index: number, windowId: string | null) => void;
+    tasks: Task[];
+    drag: DragState;
 }
 
-const tasks: Task[] = [{
+const initialTasks: Task[] = [{
     title: 'System Settings',
     description: 'Configuration tools for your computer',
     icon: '/icons/apps/systemsettings.svg',
@@ -54,65 +48,72 @@ const tasks: Task[] = [{
     x: 0,
 }];
 
-export const taskManagerStore = create<TaskManagerState>((set) => ({
-    tasks: tasks,
-    drag: createDragState(set),
-    setTaskTooltipVisible: (index, visible) =>
-        set((state) =>
-            produce(state, (draft) => {
-                draft.tasks[index].tooltipVisible = visible;
-            })
-        ),
-    setTaskPosition: (index, x) =>
-        set((state) =>
-            produce(state, (draft) => {
-                draft.tasks[index].x = x;
-            })
-        ),
-    swapTaskPosition: (index1, index2) =>
-        set((state) =>
-            produce(state, (draft) => {
-                const temp = draft.tasks[index1].x;
-                draft.tasks[index1].x = draft.tasks[index2].x;
-                draft.tasks[index2].x = temp;
-            })
-        ),
-    setTaskActive: (index, active) =>
-        set((state) =>
-            produce(state, (draft) => {
-                draft.tasks[index].active = active;
-            })
-        ),
-    setWindowId: (index, windowId) =>
-        set((state) =>
-            produce(state, (draft) => {
-                draft.tasks[index].windowId = windowId;
-                if (windowId === null) {
-                    draft.tasks[index].active = false;
-                    draft.tasks[index].isWindow = false;
-                }
-            })
-        ),
-}));
+const emptyDragState: DragState = {
+    offsetX: 0,
+    offsetY: 0,
+    dragging: 0
+};
+
+const [taskState, setTaskState] = createStore<TaskManagerState>({
+    tasks: initialTasks,
+    drag: emptyDragState
+});
+
+export { taskState, setTaskState };
+
+export const setTaskWindowId = (index: number, windowId: string | null) => {
+    setTaskState('tasks', index, produce((task) => {
+        task.windowId = windowId;
+        if (windowId === null) {
+            task.active = false;
+            task.isWindow = false;
+        }
+    }));
+};
+
+const setTaskTooltipVisible = (index: number, visible: boolean) => {
+    setTaskState('tasks', index, produce((task) => {
+        task.tooltipVisible = visible;
+    }));
+};
+
+const setTaskPosition = (index: number, x: number) => {
+    setTaskState('tasks', index, produce((task) => {
+        task.x = x;
+    }));
+};
+
+const swapTaskPosition = (index1: number, index2: number) => {
+    setTaskState('tasks', produce((tasks) => {
+        const temp = tasks[index1].x;
+        tasks[index1].x = tasks[index2].x;
+        tasks[index2].x = temp;
+    }));
+};
+
+const setTaskActive = (index: number, active: boolean) => {
+    setTaskState('tasks', index, produce((task) => {
+        task.active = active;
+    }));
+};
 
 const taskWidth = 52, taskGap = 2;
 
 const makeTaskToPosition = (index: number, towardsX: number) => {
-    const state = taskManagerStore.getState();
-    const currX = state.tasks[index].x;
+    const currX = taskState.tasks[index].x;
     if (currX === towardsX) return;
 
-    const list = state.tasks
+    const list = taskState.tasks
         .map((task, i) => ({x: task.x, i}))
         .sort((a, b) => a.x - b.x);
 
     const swapAndShift = (start: number, end: number, shift: number) => {
         for (let i = start; i !== end; i += shift) {
-            state.setTaskPosition(list[i].i, i - shift);
+            setTaskPosition(list[i].i, i - shift);
         }
     };
 
-    state.swapTaskPosition(list[currX].i, list[towardsX].i);
+    swapTaskPosition(list[currX].i, list[towardsX].i);
     if (currX < towardsX) {
         swapAndShift(currX + 1, towardsX + 1, 1);
     } else {
@@ -127,9 +128,7 @@ const defaultLastMouseDownState = {
 let lastMouseDownState = defaultLastMouseDownState;
 
 const onMouseMove = (e: MouseEvent) => {
-    const state = taskManagerStore.getState();
-
-    if (state.drag.dragging) {
+    if (taskState.drag.dragging) {
         lastMouseDownState = defaultLastMouseDownState;
         const icon = document.getElementById('dragging-icon');
         if (!icon) return;
@@ -141,8 +140,7 @@ const onMouseMove = (e: MouseEvent) => {
         icon.style.left = x + 'px';
         icon.style.top = y + 'px';
 
-        const state = taskManagerStore.getState();
-        const index = state.drag.dragging - 1;
+        const index = taskState.drag.dragging - 1;
         // check x,y in the task manager
         const taskManager = document.querySelector('.task-manager') as HTMLElement;
         if (!taskManager) return;
@@ -151,22 +149,23 @@ const onMouseMove = (e: MouseEvent) => {
         // check x could be placed
         const leftDis = x - rect.left;
         let towardsX = Math.floor(leftDis / (taskWidth + taskGap));
-        if (towardsX >= state.tasks.length) towardsX = state.tasks.length - 1;
+        if (towardsX >= taskState.tasks.length) towardsX = taskState.tasks.length - 1;
 
         makeTaskToPosition(index, towardsX);
     }
 };
 
 const onMouseUp = () => {
-    const state = taskManagerStore.getState();
-    if (state.drag.dragging) {
+    if (taskState.drag.dragging) {
+        const index = taskState.drag.dragging - 1;
+        const task = taskState.tasks[index];
+        
         if (lastMouseDownState !== defaultLastMouseDownState) {
             const time = new Date().getTime();
             if (time - lastMouseDownState.time < 200) {
-                if (state.drag.dragging === 1) {
+                if (task.windowId) {
                     const event = new Event('clickTaskIcon');
-                    const id = state.tasks[lastMouseDownState.index].windowId;
-                    if (id) document.getElementById(id)?.dispatchEvent(event);
+                    document.getElementById(task.windowId)?.dispatchEvent(event);
                 }
             }
         }
@@ -174,11 +173,13 @@ const onMouseUp = () => {
         document.getElementById('dragging-icon')?.remove();
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
-        state.setTaskActive(state.drag.dragging - 1, state.drag.offsetY === 1);
+        
+        // Keep task active if it's a window and was previously active
+        setTaskActive(index, task.isWindow && task.active);
+        setTaskState('drag', emptyDragState);
     }
-}
+};
 
-// TODO: Add touch event handling
 const onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -189,10 +190,8 @@ const onMouseDown = (e: MouseEvent) => {
         if (ele.parentElement) ele = ele.parentElement;
     }
 
-    const state = taskManagerStore.getState();
-
     const x = parseInt(getComputedStyle(ele).getPropertyValue('--x'));
-    const index = state.tasks.findIndex((task) => task.x === x);
+    const index = taskState.tasks.findIndex((task) => task.x === x);
 
     // add an icon clone along with the mouse
     const icon = ele.querySelector('span')?.cloneNode(true) as HTMLElement;
@@ -204,54 +203,57 @@ const onMouseDown = (e: MouseEvent) => {
     lastMouseDownState = {
         index,
         time: new Date().getTime(),
-    }
-    state.drag.startDrag(0, state.tasks[index].active ? 1 : 0, index + 1);
-    state.setTaskActive(index, true);
+    };
+    
+    setTaskState('drag', {
+        offsetX: 0,
+        offsetY: taskState.tasks[index].active ? 1 : 0,
+        dragging: index + 1
+    });
+    
+    setTaskActive(index, true);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
-}
+};
 
 export const TaskManager = () => {
-    const state = taskManagerStore((s) => s);
-    useEffect(() => {
+    onMount(() => {
         // rearrange pos
-        const state = taskManagerStore.getState();
-        for (let i = 0; i < state.tasks.length; i++) {
-            state.setTaskPosition(i, i);
+        for (let i = 0; i < taskState.tasks.length; i++) {
+            setTaskPosition(i, i);
         }
-    }, []);
+    });
 
     return (
-        <>
-            <ul className={'task-manager'}
-                onMouseDown={(e) => onMouseDown(e as unknown as MouseEvent)}
-            >
-                {state.tasks.map((task, index) => (
-                    <li key={index} className={
-                        task.active ? 'active' : task.isWindow ? 'inactive' : ''
-                    }
-                        css={{'--x': task.x}}
-                        onMouseEnter={() => state.setTaskTooltipVisible(index, true)}
-                        onMouseLeave={() => state.setTaskTooltipVisible(index, false)}
+        <ul class="task-manager"
+            onMouseDown={(e) => onMouseDown(e)}
+        >
+            <For each={taskState.tasks}>
+                {(task, index) => (
+                    <li class={task.active ? 'active' : task.isWindow ? 'inactive' : ''}
+                        style={{ "--x": task.x }}
+                        onMouseEnter={() => setTaskTooltipVisible(index(), true)}
+                        onMouseLeave={() => setTaskTooltipVisible(index(), false)}
                     >
-                        <span css={{
+                        <span style={{
                             display: 'inline-block',
                             height: '32px',
                             width: '32px',
-                            verticalAlign: 'middle',
-                            backgroundImage: `url(${task.icon})`,
-                            backgroundSize: 'cover',
+                            "vertical-align": 'middle',
+                            "background-image": `url(${task.icon})`,
+                            "background-size": 'cover',
                         }}/>
-                        {!task.isWindow && <DescriptionTooltip
-                            visible={task.tooltipVisible}
-                            title={task.title}
-                            description={task.description}
-                        />
-                        }
+                        {!task.isWindow && (
+                            <DescriptionTooltip
+                                visible={task.tooltipVisible}
+                                title={task.title}
+                                description={task.description}
+                            />
+                        )}
                     </li>
-                ))}
-            </ul>
-        </>
+                )}
+            </For>
+        </ul>
     );
-}
+};
 
