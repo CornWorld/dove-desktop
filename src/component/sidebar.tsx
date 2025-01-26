@@ -1,6 +1,6 @@
 import type { Component } from 'solid-js';
 import { For } from 'solid-js';
-import '@/component/sidebar.scss';
+import './siderbar.scss';
 
 export interface SidebarSelection {
     name: string;

@@ -9,7 +9,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: '@import "@/breeze-color.scss";'
+        additionalData: '@use "@/breeze-color" as *;'
       }
     }
   },

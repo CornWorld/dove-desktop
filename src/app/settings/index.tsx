@@ -1,7 +1,7 @@
 import { Headerbar } from "@/component/headerbar";
 import { createSidebarNode, Sidebar, SidebarSelection } from "@/component/sidebar";
 import { createSignal } from "solid-js";
-import '@/app/settings.scss';
+import './settings.scss';
 import { Window, createWindowStore } from "@/component/window";
 import { QuickSettings } from "./quick-settings";
 

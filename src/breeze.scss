@@ -1,4 +1,4 @@
-
+@use 'sass:color';
 .tooltip {
   position: absolute;
   bottom: 100%;
@@ -33,9 +33,9 @@ button {
   padding: 6px;
   background-clip: border-box;
   background: linear-gradient(180deg,
-          mix($theme_button_background_normal, white, 0.03125) 0%,
+          color.mix($theme_button_background_normal, white, 0.03125 * 1%) 0%,
           $theme_button_background_normal 50%,
-          mix($theme_button_background_normal, black, 0.03125) 100%
+          color.mix($theme_button_background_normal, black, 0.03125 * 1%) 100%
   );
 
   .selected {

@@ -47,10 +47,11 @@ const [workspaceState, setWorkspaceState] = createStore<WorkspaceState>({
 });
 
 // Initialize drags after store creation since they need the setter
-const iconDrag = createDragState(setWorkspaceState, 'iconDrag');
-const windowDrag = createDragState(setWorkspaceState, 'windowDrag');
-
-setWorkspaceState('iconDrag', iconDrag);
-setWorkspaceState('windowDrag', windowDrag);
+// const iconDrag = createDragState(setWorkspaceState, 'iconDrag');
+// const windowDrag = createDragState(setWorkspaceState, 'windowDrag');
+//
+// setWorkspaceState('iconDrag', iconDrag);
+// setWorkspaceState('windowDrag', windowDrag);
+// TODO
 
 export { workspaceState, setWorkspaceState };
