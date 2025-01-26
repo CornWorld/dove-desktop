@@ -1,5 +1,5 @@
 import { createStore, produce } from "solid-js/store";
-import {onMount, onCleanup, Component, JSX, createSignal} from "solid-js";
+import {onMount, onCleanup, Component, JSX, createSignal, createEffect} from "solid-js";
 import { displayState } from "@/display";
 import {useDrag, useDragWithLastPos} from "@/utils/drag";
 import { setWorkspaceState } from "@/workspace/store";
@@ -39,9 +39,6 @@ export interface WindowHandler {
 
 export interface WindowStore extends WindowState, WindowHandler {
     onClickTaskIcon: () => void;
-    // onMouseDown: (e: MouseEvent) => void;
-    // onMouseMove: (e: MouseEvent) => void;
-    // onMouseUp: (e: MouseEvent) => void;
     onDBClick: (e: MouseEvent) => void;
 }
 
@@ -156,9 +153,13 @@ export const Window: Component<WindowProps> = (props) => {
             }
         });
 
-        useDragWithLastPos(windowRef()!, titlebarRef()!, (x, y) => {
-            const {x: newX, y: newY} = rePos(props.store, x, y);
-            props.store.setPos(newX, newY);
+        createEffect(() => {
+            useDragWithLastPos(windowRef()!, titlebarRef()!, (x, y) => {
+                const {x: newX, y: newY} = rePos(props.store, x, y);
+                props.store.setPos(newX, newY);
+            }, {
+                allowDrag: props.store.status === 'normal'
+            });
         });
     });
 
