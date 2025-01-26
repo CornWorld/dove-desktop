@@ -1,7 +1,7 @@
 import { createStore, produce } from "solid-js/store";
-import { onMount, onCleanup, Component, JSX } from "solid-js";
+import {onMount, onCleanup, Component, JSX, createSignal} from "solid-js";
 import { displayState } from "@/display";
-import { createDragState, DragState } from "@/utils/drag";
+import {useDrag, useDragWithLastPos} from "@/utils/drag";
 import { setWorkspaceState } from "@/workspace/store";
 import { setTaskWindowId } from "@/workspace/taskmanager";
 
@@ -39,16 +39,10 @@ export interface WindowHandler {
 
 export interface WindowStore extends WindowState, WindowHandler {
     onClickTaskIcon: () => void;
-    onMouseDown: (e: MouseEvent) => void;
-    onMouseMove: (e: MouseEvent) => void;
-    onMouseUp: (e: MouseEvent) => void;
+    // onMouseDown: (e: MouseEvent) => void;
+    // onMouseMove: (e: MouseEvent) => void;
+    // onMouseUp: (e: MouseEvent) => void;
     onDBClick: (e: MouseEvent) => void;
-    drag: DragState;
-}
-
-interface DraggableState extends DragState {
-    startDrag: (offsetX: number, offsetY: number, dragging?: number) => void;
-    stopDrag: () => void;
 }
 
 const rePos = (state: WindowState, x: number, y: number) => {
@@ -74,15 +68,6 @@ const rePos = (state: WindowState, x: number, y: number) => {
 };
 
 export const createWindowStore = (initialState: WindowState) => {
-    // Initialize with empty drag state first
-    const emptyDragState: DraggableState = {
-        offsetX: 0,
-        offsetY: 0,
-        dragging: 0,
-        startDrag: () => {},
-        stopDrag: () => {}
-    };
-
     const [state, setState] = createStore<WindowStore>({
         ...initialState,
         originInfo: {
@@ -91,7 +76,6 @@ export const createWindowStore = (initialState: WindowState) => {
             width: initialState.width,
             height: initialState.height,
         },
-        drag: emptyDragState,
         setPos: (x: number, y: number) => setState(produce((s) => { s.x = x; s.y = y; })),
         setSize: (width: number, height: number) => setState(produce((s) => { s.width = width; s.height = height; })),
         setStatus: (status: string) => setState(produce((s) => { s.status = status; })),
@@ -129,31 +113,6 @@ export const createWindowStore = (initialState: WindowState) => {
                 state.minimize();
             }
         },
-        onMouseDown: (e: MouseEvent) => {
-            const ele = e.target as HTMLElement;
-            // Only prevent events when clicking the titlebar
-            if (ele.closest('.titlebar')) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (ele.tagName === 'BUTTON' || ele.tagName === 'INPUT') return;
-                (state.drag as DraggableState).startDrag(e.clientX - state.x, e.clientY - state.y);
-                window.addEventListener('mousemove', state.onMouseMove);
-                window.addEventListener('mouseup', state.onMouseUp);
-            }
-        },
-        onMouseMove: (e: MouseEvent) => {
-            const newX = e.clientX - state.drag.offsetX;
-            const newY = e.clientY - state.drag.offsetY;
-            const {x, y} = rePos(state, newX, newY);
-            state.setPos(x, y);
-        },
-        onMouseUp: () => {
-            if (state.drag.dragging) {
-                window.removeEventListener('mousemove', state.onMouseMove);
-                window.removeEventListener('mouseup', state.onMouseUp);
-                (state.drag as DraggableState).stopDrag();
-            }
-        },
         onDBClick: () => {
             if (state.status === 'maximized' && state.originInfo) {
                 setState(produce((s) => {
@@ -169,9 +128,6 @@ export const createWindowStore = (initialState: WindowState) => {
         },
     });
 
-    // Initialize real drag state after store creation
-    setState('drag', createDragState(setState) as DraggableState);
-
     return [state, setState] as const;
 };
 
@@ -182,6 +138,9 @@ interface WindowProps {
 }
 
 export const Window: Component<WindowProps> = (props) => {
+    const [windowRef, setWindowRef] = createSignal<HTMLElement>();
+    const [titlebarRef, setTitlebarRef] = createSignal<HTMLElement>();
+
     onMount(() => {
         const ele = document.getElementById(props.store.id);
         if (ele) {
@@ -196,14 +155,19 @@ export const Window: Component<WindowProps> = (props) => {
                 ele.removeEventListener('dblclick', props.store.onDBClick);
             }
         });
+
+        useDragWithLastPos(windowRef()!, titlebarRef()!, (x, y) => {
+            const {x: newX, y: newY} = rePos(props.store, x, y);
+            props.store.setPos(newX, newY);
+        });
     });
 
     return (
-        <div 
+        <div
+            ref={setWindowRef}
             class="window" 
             style={{
-                left: `${props.store.x}px`,
-                top: `${props.store.y}px`,
+                transform: `translate3d(${props.store.x}px, ${props.store.y}px, 0)`,
                 width: `${props.store.width}px`,
                 height: `${props.store.height}px`,
                 "z-index": props.store.z,
@@ -214,7 +178,7 @@ export const Window: Component<WindowProps> = (props) => {
         >
             <div 
                 class="titlebar"
-                onMouseDown={(e) => props.store.onMouseDown(e)}
+                ref={setTitlebarRef}
             >
                 <div class="windowcontrols left">
                     <button 
