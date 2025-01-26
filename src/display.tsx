@@ -1,7 +1,7 @@
-import {Workspace} from "./workspace";
+import {Workspace} from "@/workspace";
 import {Suspense} from "solid-js";
 import {createStore} from "solid-js/store";
-import {Settings} from "./app/settings";
+import {Settings} from "@/app/settings";
 
 interface DisplayState {
     width: number;

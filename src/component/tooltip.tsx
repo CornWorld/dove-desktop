@@ -1,6 +1,6 @@
 import { createEffect } from "solid-js";
 import type { Component, JSX } from "solid-js";
-import '../breeze.scss';
+import '@/breeze.scss';
 
 interface TooltipProps {
     children?: JSX.Element;

@@ -5,7 +5,7 @@ import { createDragState, DragState } from "@/utils/drag";
 import { setWorkspaceState } from "@/workspace/store";
 import { setTaskWindowId } from "@/workspace/taskmanager";
 
-import './window.scss';
+import '@/component/window.scss';
 
 export interface WindowState {
     title: string;

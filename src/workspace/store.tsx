@@ -1,7 +1,7 @@
-import { createDragState, DragState } from "../utils/drag";
-import { IconStore, createIconStore } from "./icon";
+import { createDragState, DragState } from "@/utils/drag";
+import { IconStore, createIconStore } from "@/workspace/icon";
 import { createStore } from "solid-js/store";
-import { WindowState, WindowHandler } from "../component/window";
+import { WindowState, WindowHandler } from "@/component/window";
 
 type Window = WindowState & WindowHandler;
 

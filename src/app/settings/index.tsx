@@ -1,8 +1,8 @@
-import { Headerbar } from "../../component/headerbar";
-import { createSidebarNode, Sidebar, SidebarSelection } from "../../component/sidebar";
+import { Headerbar } from "@/component/headerbar";
+import { createSidebarNode, Sidebar, SidebarSelection } from "@/component/sidebar";
 import { createSignal } from "solid-js";
-import './settings.scss';
-import { Window, createWindowStore } from "../../component/window";
+import '@/app/settings.scss';
+import { Window, createWindowStore } from "@/component/window";
 import { QuickSettings } from "./quick-settings";
 
 const [windowState] = createWindowStore({

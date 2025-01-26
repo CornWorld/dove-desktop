@@ -1,7 +1,7 @@
 import { createStore } from "solid-js/store";
 import { Component } from "solid-js";
-import { displayState } from "../display";
-import { workspaceState, setWorkspaceState } from "./store";
+import { displayState } from "@/display";
+import { workspaceState, setWorkspaceState } from "@/workspace/store";
 
 interface Icon {
     title: string,

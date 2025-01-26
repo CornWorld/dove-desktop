@@ -1,7 +1,7 @@
 import { createStore, produce } from "solid-js/store";
 import { onMount, For } from "solid-js";
-import { DescriptionTooltip } from "../component/tooltip";
-import { DragState } from "../utils/drag";
+import { DescriptionTooltip } from "@/component/tooltip";
+import { DragState } from "@/utils/drag";
 
 interface Task {
     title: string;

@@ -1,10 +1,10 @@
-import {displayState} from "../display";
-import {TaskManager} from "./taskmanager";
-import {AppLauncher} from "./app-launcher";
-import {DigitalClock} from "./digital-clock";
+import {displayState} from "@/display";
+import {TaskManager} from "@/workspace/taskmanager";
+import {AppLauncher} from "@/workspace/app-launcher";
+import {DigitalClock} from "@/workspace/digital-clock";
 import './index.scss';
-import {workspaceState, setWorkspaceState} from "./store";
-import {Icon, IconHeight, IconMargin, IconWidth, placeIcon} from "./icon";
+import {workspaceState, setWorkspaceState} from "@/workspace/store";
+import {Icon, IconHeight, IconMargin, IconWidth, placeIcon} from "@/workspace/icon";
 import { For } from "solid-js";
 import { onMount } from "solid-js";
 

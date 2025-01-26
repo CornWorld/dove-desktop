@@ -1,6 +1,6 @@
 import { createSignal, createEffect, onCleanup, For } from "solid-js";
 import dayjs from "dayjs";
-import { Tooltip } from "../component/tooltip";
+import { Tooltip } from "@/component/tooltip";
 
 export const DigitalClock = () => {
     const [clock, setClock] = createSignal('');

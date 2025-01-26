@@ -1,6 +1,6 @@
 import { createSignal, onMount, onCleanup } from "solid-js";
-import { DescriptionTooltip } from "../component/tooltip";
-import { createSidebarNode, Sidebar, SidebarSelection } from "../component/sidebar";
+import { DescriptionTooltip } from "@/component/tooltip";
+import { createSidebarNode, Sidebar, SidebarSelection } from "@/component/sidebar";
 
 interface KickoffProps {
     open: boolean;
