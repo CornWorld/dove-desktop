@@ -16,7 +16,8 @@
     "eslint-plugin:8.21.0": "link:@typescript-eslint/eslint-plugin:8.21.0",
     "immer": "^10.1.1",
     "parser:8.21.0": "link:@typescript-eslint/parser:8.21.0",
-    "solid-js": "^1.9.4"
+    "solid-js": "^1.9.4",
+    "typescript-eslint": "^8.22.0"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.13.5",
