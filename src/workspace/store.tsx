@@ -1,6 +1,6 @@
-import { IconStore, createIconStore } from "@/workspace/icon";
-import { createStore } from "solid-js/store";
-import { WindowState, WindowHandler } from "@/component/window";
+import {createIconStore} from "@/workspace/icon";
+import {createStore} from "solid-js/store";
+import {WindowHandler, WindowState} from "@/component/window";
 
 type Window = WindowState & WindowHandler;
 
@@ -27,7 +27,7 @@ interface WorkspaceState extends WindowManagerStore {
 
 const [workspaceStore, setWorkspaceStore] = createStore<WorkspaceState>({
 	...createWindowManagerStore(),
-	
+
 	panelFloat: false,
 	setPanelFloat: (float) => setWorkspaceStore('panelFloat', float),
 });
@@ -42,4 +42,4 @@ export const iconStore = createIconStore();
 // setWorkspaceState('windowDrag', windowDrag);
 // TODO
 
-export { workspaceStore, setWorkspaceStore };
+export {workspaceStore, setWorkspaceStore};
