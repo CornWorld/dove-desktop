@@ -10,29 +10,29 @@ export interface UseDragOptions {
 
 export const useDrag = (
     eventElement: HTMLElement,
-    dragNotify: (x: number, y: number) => void,
+    dragNotify: (dx: number, dy: number) => void,
     options?: UseDragOptions
 ) => {
 
-    options ??= { allowDrag: true };
+    options ??= {allowDrag: true};
 
     const [isPointerDown, setPointerDown] = createSignal(false);
     const [isDragging, setIsDragging] = createSignal(false);
-    const [offset, setOffset] = createSignal({ x: 0, y: 0 });
+    const [offset, setOffset] = createSignal({x: 0, y: 0});
 
     const allowDrag = () => {
         if (typeof options.allowDrag === 'function') {
             return options.allowDrag();
         } else {
             return options.allowDrag;
-            }
+        }
     }
 
     const onPointerDown = (event: PointerEvent) => {
         setPointerDown(true);
-        setOffset({ x: event.clientX, y: event.clientY });
+        setOffset({x: event.clientX, y: event.clientY});
 
-        if(debug) {
+        if (debug) {
             console.group(`onPointerDown(${eventElement.classList})`);
         }
 
@@ -40,30 +40,31 @@ export const useDrag = (
         window.addEventListener('pointerup', onPointerUp);
     }
     const onPointerMove = (event: PointerEvent) => {
-        if(!isPointerDown()) return;
-        if(!isDragging()) {
+        if (!isPointerDown()) return;
+        if (!isDragging()) {
             options.delay ??= 0;
             if (Math.abs(event.clientX - offset().x) > options.delay
                 || Math.abs(event.clientY - offset().y) > options.delay) {
-                if(allowDrag()) {
+                if (allowDrag()) {
                     setIsDragging(true);
-                    if(debug) console.log(`onPointerMove(${eventElement.classList}) dragging started`);
+                    if (debug) console.log(`onPointerMove(${eventElement.classList}) dragging started`);
                 }
             }
+        } else {
+            const {x, y} = offset();
+            const dx = event.clientX - x;
+            const dy = event.clientY - y;
+
+            dragNotify(dx, dy);
+
+            if (debug) {
+                console.log(`onPointerMove(${eventElement.classList}) dx: ${dx}, dy: ${dy}`);
+            }
         }
-
-        const { x, y } = offset();
-        const dx = event.clientX - x;
-        const dy = event.clientY - y;
-
-
-        dragNotify(dx, dy);
-
-        if(debug) console.log(`onPointerMove(${eventElement.classList}) dx: ${dx}, dy: ${dy}`);
     }
     const onPointerUp = () => {
         setIsDragging(false);
-        if(debug) console.groupEnd();
+        if (debug) console.groupEnd();
 
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
@@ -79,5 +80,5 @@ export const useDrag = (
         window.removeEventListener('pointerup', onPointerUp);
     });
 
-    return { isDragging };
+    return {isDragging, offset};
 }

@@ -1,5 +1,5 @@
 import {Workspace} from "@/workspace";
-import {Suspense} from "solid-js";
+import {createSignal, Suspense} from "solid-js";
 import {createStore} from "solid-js/store";
 import {Settings} from "@/app/settings";
 
@@ -13,16 +13,28 @@ interface DisplayState {
 }
 
 const [displayStore, setDisplayStore] = createStore<DisplayState>({
-    width: 1024,
-    height: 768,
-    backgroundImage: '/wallpapers/light/1024x768.png',
+    width: 1920,
+    height: 1080,
+    backgroundImage: '/wallpapers/light/1920x1080.png',
 
     resize: (width, height) => {
-        setDisplayStore({ width, height });
+        setDisplayStore({width, height});
     }
 });
 
-export { displayStore, setDisplayStore };
+export {displayStore, setDisplayStore};
+
+const [ref, setRef] = createSignal<HTMLDivElement>();
+
+export const transEventPos = (e: PointerEvent)=> {
+    const rect = ref()!.getBoundingClientRect();
+    return {clientX: e.clientX - rect.x, clientY: e.clientY - rect.y};
+}
+
+export const transPos = (x: number, y: number) => {
+    const rect = ref()!.getBoundingClientRect();
+    return {x: x - rect.x, y: y - rect.y};
+}
 
 export const Display = () => {
     return (
@@ -34,7 +46,7 @@ export const Display = () => {
             background: displayStore.backgroundImage ? `url(${displayStore.backgroundImage})` : displayStore.backgroundColor,
             border: '0.1px solid black',
             perspective: '1000px',
-        }} id="display">
+        }} id="display" ref={setRef}>
             <Suspense fallback={<></>}>
                 {/* TODO Loading screen*/}
                 <Workspace/>

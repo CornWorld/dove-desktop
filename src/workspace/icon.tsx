@@ -1,5 +1,5 @@
-import {createStore} from "solid-js/store";
-import {Component, createEffect, createSignal, onMount} from "solid-js";
+import {createStore, produce} from "solid-js/store";
+import {Component} from "solid-js";
 import {displayStore} from "@/display";
 
 const IconWidth = 103;
@@ -98,6 +98,8 @@ export interface IconStore {
     selectAll: () => void;
     cancelSelect: () => void;
 
+    drag: (dx: number, dy: number) => void;
+
     /**
      * Get the next available position in grid for the icon by index
      * */
@@ -106,34 +108,50 @@ export interface IconStore {
      * Find the closest available position in grid for the icon by position
      * */
     findClosestPos: (pos: Pos) => GridPos;
+
+    /**
+     * Get the index of the icon that is clicked
+     * */
+    getClicked: (x: number, y: number) => number;
 }
 
 export function createIconStore() {
+    /**
+     * Create a grid map for icons.
+     * DO NOT USE THIS in the initial store creation
+     * */
     const createGridMap = () => {
         const dis = IconWidth + IconMargin;
         const maxCol = Math.floor(displayStore.width / dis);
         const maxRow = Math.floor(displayStore.height / dis);
         const gridMap = new Array(maxRow).fill(0).map(() => new Array(maxCol).fill(false));
-        return { dis, maxCol, maxRow, gridMap };
+        return {dis, maxCol, maxRow, gridMap};
     };
 
     const [store, setStore] = createStore<IconStore>({
         icons: [],
         add: (title, iconPath) => {
             const pos = store.getNextPosByIndex().toPos();
-            const icon = { title, iconPath, pos, isSelected: false };
+            const icon = {title, iconPath, pos, isSelected: false};
             setStore('icons', (prev) => [...prev, icon]);
             return store.icons.length;
         },
         remove: (index) => {
-            setStore('icons', (prev) => prev.filter((_, i) => i !== index))
+            setStore('icons', (prev) =>
+                prev.filter((_, i) => i !== index))
         },
-        select: (index, isSelected) => setStore('icons', (prev) => prev.map((icon, i) => i === index ? { ...icon, isSelected } : icon)),
-        selectAll: () => setStore('icons', (prev) => prev.map((icon) => ({ ...icon, isSelected: true }))),
-        cancelSelect: () => setStore('icons', (prev) => prev.map((icon) => ({ ...icon, isSelected: false }))),
+        select: (index, isSelected) => setStore('icons', (prev) =>
+            prev.map((icon, i) => i === index ? {
+            ...icon,
+            isSelected
+        } : icon)),
+        selectAll: () => setStore('icons', (prev) =>
+            prev.map((icon) => ({...icon, isSelected: true}))),
+        cancelSelect: () => setStore('icons', (prev) =>
+            prev.map((icon) => ({...icon, isSelected: false}))),
 
         getNextPosByIndex: () => {
-            const { dis, maxCol, maxRow, gridMap } = createGridMap();
+            const {maxCol, maxRow, gridMap} = createGridMap();
             store.icons.forEach((icon) => {
                 const gridPos = icon.pos.toGrid();
                 gridMap[gridPos.row][gridPos.col] = true;
@@ -176,7 +194,25 @@ export function createIconStore() {
                 }
             }
             return closestPos;
-        }
+        },
+        drag: (dx, dy) => {
+            const selected = store.icons
+                .map((i, index)=>i.isSelected ? index : -1)
+                .filter(i=>i!=-1);
+            setStore('icons', selected, produce(icon=>{
+                icon.pos.x += dx;
+                icon.pos.y += dy;
+                console.log({x: icon.pos.x, y: icon.pos.y});
+            }));
+        },
+
+        getClicked: (x, y) : number /* ? when remove `: number`, a lint error append */ => {
+            return store.icons.findIndex((icon: Icon) => {
+                const {x: ix, y: iy} = icon.pos;
+                return x >= ix && x <= ix + IconWidth
+                    && y >= iy && y <= iy + IconHeight;
+            });
+        },
     });
 
     return store;
