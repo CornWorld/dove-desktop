@@ -1,9 +1,11 @@
-import {createSignal, onMount, onCleanup, createEffect} from "solid-js";
+import {createSignal, onMount, onCleanup, createEffect, Accessor} from "solid-js";
 
 const debug = true;
 
 export interface UseDragOptions {
-    allowDrag: boolean;
+    allowDrag: boolean | (() => boolean);
+    delay?: number; // px. default 0. circle radius to start dragging
+
 }
 
 export const useDrag = (
@@ -11,38 +13,57 @@ export const useDrag = (
     dragNotify: (x: number, y: number) => void,
     options?: UseDragOptions
 ) => {
-    options = options ?? { allowDrag: true };
 
+    options ??= { allowDrag: true };
+
+    const [isPointerDown, setPointerDown] = createSignal(false);
     const [isDragging, setIsDragging] = createSignal(false);
     const [offset, setOffset] = createSignal({ x: 0, y: 0 });
 
-    const onPointerDown = (event: PointerEvent) => {
-        if(!options.allowDrag) {
-            if(debug) console.log(`onPointerDown(${eventElement.classList}) dragging not allowed`);
-            return;
-        }
+    const allowDrag = () => {
+        if (typeof options.allowDrag === 'function') {
+            return options.allowDrag();
+        } else {
+            return options.allowDrag;
+            }
+    }
 
-        setIsDragging(true);
+    const onPointerDown = (event: PointerEvent) => {
+        setPointerDown(true);
         setOffset({ x: event.clientX, y: event.clientY });
-        if(debug) console.log(`onPointerDown x: ${event.clientX}, y: ${event.clientY}`);
+
+        if(debug) {
+            console.group(`onPointerDown(${eventElement.classList})`);
+        }
 
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
     }
     const onPointerMove = (event: PointerEvent) => {
-        if (isDragging()) {
-            const { x, y } = offset();
-            const dx = event.clientX - x;
-            const dy = event.clientY - y;
-
-            dragNotify(dx, dy);
-
-            if(debug) console.log(`onPointerMove dx: ${dx}, dy: ${dy}`);
+        if(!isPointerDown()) return;
+        if(!isDragging()) {
+            options.delay ??= 0;
+            if (Math.abs(event.clientX - offset().x) > options.delay
+                || Math.abs(event.clientY - offset().y) > options.delay) {
+                if(allowDrag()) {
+                    setIsDragging(true);
+                    if(debug) console.log(`onPointerMove(${eventElement.classList}) dragging started`);
+                }
+            }
         }
+
+        const { x, y } = offset();
+        const dx = event.clientX - x;
+        const dy = event.clientY - y;
+
+
+        dragNotify(dx, dy);
+
+        if(debug) console.log(`onPointerMove(${eventElement.classList}) dx: ${dx}, dy: ${dy}`);
     }
     const onPointerUp = () => {
         setIsDragging(false);
-        if(debug) console.log(`onPointerUp(${eventElement.classList}) dragging stopped`);
+        if(debug) console.groupEnd();
 
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
@@ -58,36 +79,5 @@ export const useDrag = (
         window.removeEventListener('pointerup', onPointerUp);
     });
 
-    return { isDragging };
-}
-
-const parseTranslate3d = (str: string) =>
-    str.slice('translate3d('.length, -')'.length)
-        .split(',')
-        .map((s)=> s.endsWith('px') ? s.slice(0, -'px'.length) : s)
-        .map(Number);
-
-export const useDragWithLastPos = (
-    rootElement: HTMLElement,
-    eventElement?: HTMLElement,
-    dragNotify = (x:number, y:number)=>{
-        rootElement.style.transform = `translate3d(${x}px, ${y}px, 0px)`;
-    },
-    options?: UseDragOptions
-)=> {
-    if(!eventElement) eventElement = rootElement;
-
-    const [lastPos, setLastPos] = createSignal({ x: 0, y: 0 });
-    const dragNotifyWithLastPos = (x: number, y: number) => {
-        dragNotify(x + lastPos().x, y + lastPos().y);
-    }
-
-    const { isDragging } = useDrag(eventElement, dragNotifyWithLastPos, options);
-    createEffect(() => {
-        if(isDragging()) {
-            const [x, y] = Object.values(parseTranslate3d(rootElement.style.transform));
-            setLastPos({x, y});
-        }
-    })
     return { isDragging };
 }

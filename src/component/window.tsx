@@ -1,7 +1,7 @@
 import { createStore, produce } from "solid-js/store";
-import {onMount, onCleanup, Component, JSX, createSignal, createEffect} from "solid-js";
+import {onMount, onCleanup, Component, JSX, createSignal, createEffect, on} from "solid-js";
 import { displayStore } from "@/display";
-import {useDrag, useDragWithLastPos} from "@/utils/drag";
+import {useDrag} from "@/utils/drag";
 import { setWorkspaceStore } from "@/workspace/store";
 import { setTaskWindowId } from "@/workspace/taskmanager";
 
@@ -139,28 +139,30 @@ export const Window: Component<WindowProps> = (props) => {
     const [titlebarRef, setTitlebarRef] = createSignal<HTMLElement>();
 
     onMount(() => {
-        const ele = document.getElementById(props.store.id);
-        if (ele) {
-            ele.addEventListener('clickTaskIcon', props.store.onClickTaskIcon);
-            ele.addEventListener('dblclick', props.store.onDBClick);
-        }
-        props.store.setPos(props.store.x, props.store.y);
+        windowRef()!.addEventListener('clickTaskIcon', props.store.onClickTaskIcon);
+        windowRef()!.addEventListener('dblclick', props.store.onDBClick);
 
         onCleanup(() => {
-            if (ele) {
-                ele.removeEventListener('clickTaskIcon', props.store.onClickTaskIcon);
-                ele.removeEventListener('dblclick', props.store.onDBClick);
-            }
+            windowRef()!.removeEventListener('clickTaskIcon', props.store.onClickTaskIcon);
+            windowRef()!.removeEventListener('dblclick', props.store.onDBClick);
         });
 
-        createEffect(() => {
-            useDragWithLastPos(windowRef()!, titlebarRef()!, (x, y) => {
-                const {x: newX, y: newY} = rePos(props.store, x, y);
-                props.store.setPos(newX, newY);
-            }, {
-                allowDrag: props.store.status === 'normal'
-            });
+        const [lastPos, setLastPos] = createSignal({ x: 0, y: 0 });
+        const {isDragging} = useDrag(titlebarRef()!, (dx, dy) => {
+           const { x: startX, y: startY } = lastPos();
+            const { x: newX, y: newY } = rePos(
+                props.store,
+                startX + dx,
+                startY + dy
+            );
+            props.store.setPos(newX, newY);
         });
+
+        createEffect(on(isDragging, (dragging) => {
+            if (dragging) {
+                setLastPos({ x: props.store.x, y: props.store.y });
+            }
+        }, { defer: true }));
     });
 
     return (
