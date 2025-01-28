@@ -1,82 +1,64 @@
-import { createStore } from "solid-js/store";
-import { Component } from "solid-js";
-import { displayState } from "@/display";
-import { workspaceState, setWorkspaceState } from "@/workspace/store";
+import {createStore} from "solid-js/store";
+import {Component, createEffect, createSignal, onMount} from "solid-js";
+import {displayStore} from "@/display";
 
-interface Icon {
-    title: string,
-    path: string,
-    selected: boolean,
+const IconWidth = 103;
+const IconHeight = 93;
+const IconMargin = 5;
+export {IconWidth, IconHeight, IconMargin};
+
+interface Pos {
     x: number,
     y: number,
+
+    toGrid(): GridPos;
+}
+
+interface GridPos {
     col: number,
     row: number,
+
+    toPos(): Pos;
 }
 
-const createIcon = (title: string, path: string): Icon => ({
-    title, path: path, selected: false,
-    x: 0, y: 0, col: 0, row: 0,
+const makePos = (x: number, y: number): Pos => ({
+    x, y,
+
+    toGrid() {
+        const dis = IconWidth + IconMargin;
+        return makeGridPos(Math.round(x / dis), Math.round(y / dis),);
+    }
 });
 
-const exampleIcons: Icon[] = [
-    createIcon('Home', '/icons/places/folder-activities.svg'),
-    createIcon('Trash', '/icons/places/user-trash.svg'),
-];
+const makeGridPos = (col: number, row: number): GridPos => ({
+    col, row,
 
-export interface IconStore {
-    icons: Icon[];
-    selectIcon: (index: number, setTo?: boolean) => void,
-    setIconPos: (index: number, x: number, y: number) => void,
-    setGridPos: (index: number, col: number, row: number) => void,
-    cancelSelection: () => void,
+    toPos() {
+        const dis = IconWidth + IconMargin;
+        return makePos(col * dis, row * dis);
+    }
+});
+
+export {makePos, makeGridPos};
+
+interface Icon {
+    title: string;
+    iconPath: string;
+    pos: Pos;
+    isSelected: boolean;
 }
 
-export function createIconStore() {
-    const [state, setState] = createStore<IconStore>({
-        icons: exampleIcons,
-        setIconPos: (index, x, y) => {
-            setState('icons', index, {
-                ...state.icons[index],
-                x,
-                y
-            });
-        },
-        setGridPos: (index, col, row) => {
-            setState('icons', index, {
-                ...state.icons[index],
-                col,
-                row
-            });
-        },
-        selectIcon: (index, setTo) => {
-            setState('icons', index, {
-                ...state.icons[index],
-                selected: setTo ?? !state.icons[index].selected
-            });
-        },
-        cancelSelection: () => {
-            setState('icons', icons => icons.map(icon => ({
-                ...icon,
-                selected: false
-            })));
-        }
-    });
-    return state;
+export const placeIcon = (index: number, x: number, y: number) => {
+    console.warn('placeIcon not implemented');
 }
 
-interface IconProps {
-    icon: Icon;
-    index: number;
-    isDragging: boolean;
-}
-
-export const Icon: Component<IconProps> = (props) => {
+export const Icon: Component<Icon> = (props) => {
     return (
         <div style={{
             "border-radius": "5px",
-            width: "103px",
-            height: "93px",
-            margin: "5px",
+            width: `${IconWidth}px`,
+            height: `${IconHeight}px`,
+            margin: `${IconMargin}px`,
             padding: "5px",
             display: "flex",
             "flex-direction": "column",
@@ -84,102 +66,119 @@ export const Icon: Component<IconProps> = (props) => {
             "align-items": "center",
             position: "absolute",
             "box-sizing": "border-box",
-            "z-index": props.isDragging ? "3" : "2",
-            left: `${props.icon.x}px`,
-            top: `${props.icon.y}px`,
-            outline: props.icon.selected ? "1px solid rgb(61, 174, 233)" : "0",
-            "background-color": props.icon.selected ? "rgba(61, 174, 233, 0.2)" : "transparent",
-            "pointer-events": "all"
+            "z-index": props.isSelected ? "3" : "2",
+            outline: props.isSelected ? "1px solid rgb(61, 174, 233)" : "0",
+            "background-color": props.isSelected ? "rgba(61, 174, 233, 0.2)" : "transparent",
+            "transform": `translate3d(${props.pos.x}px, ${props.pos.y}px, 0px)`,
+            // "pointer-events": "all"
         }}>
-            <img src={props.icon.path} alt={props.icon.title} style={{
+            <img alt={props.title} src={props.iconPath} style={{
                 width: "64px",
                 margin: "auto",
                 height: "64px",
                 cursor: "pointer",
-                "pointer-events": "all"
-            }} data-index={props.index}/>
+                // "pointer-events": "all"
+            }}/>
             <span style={{
                 color: "white",
                 "font-size": "13px",
                 "font-weight": "medium",
-                "pointer-events": "none"
-            }}>{props.icon.title}</span>
+                // "pointer-events": "none"
+            }}>{props.title}</span>
         </div>
     );
 };
 
-const IconWidth = 103;
-const IconHeight = 93;
-const IconMargin = 5;
+export interface IconStore {
+    icons: Icon[];
 
-export { IconWidth, IconHeight, IconMargin };
+    add: (title: string, iconPath: string) => number;
+    remove: (index: number) => void;
+    select: (index: number, isSelected: boolean) => void;
+    selectAll: () => void;
+    cancelSelect: () => void;
 
-const pos2Grid = (x: number, y: number) => {
-    return {
-        col: Math.round(x / (IconWidth + IconMargin)),
-        row: Math.round(y / (IconHeight + IconMargin)),
-    }
-};
+    /**
+     * Get the next available position in grid for the icon by index
+     * */
+    getNextPosByIndex: () => GridPos;
+    /**
+     * Find the closest available position in grid for the icon by position
+     * */
+    findClosestPos: (pos: Pos) => GridPos;
+}
 
-const grid2Pos = (col: number, row: number) => {
-    return {
-        x: col * (IconWidth + IconMargin),
-        y: row * (IconHeight + IconMargin),
-    }
-};
+export function createIconStore() {
+    const createGridMap = () => {
+        const dis = IconWidth + IconMargin;
+        const maxCol = Math.floor(displayStore.width / dis);
+        const maxRow = Math.floor(displayStore.height / dis);
+        const gridMap = new Array(maxRow).fill(0).map(() => new Array(maxCol).fill(false));
+        return { dis, maxCol, maxRow, gridMap };
+    };
 
-const findIconIndexByGrid = (col: number, row: number) => {
-    return workspaceState.icons.findIndex((icon) => icon.col === col && icon.row === row);
-};
+    const [store, setStore] = createStore<IconStore>({
+        icons: [],
+        add: (title, iconPath) => {
+            const pos = store.getNextPosByIndex().toPos();
+            const icon = { title, iconPath, pos, isSelected: false };
+            setStore('icons', (prev) => [...prev, icon]);
+            return store.icons.length;
+        },
+        remove: (index) => {
+            setStore('icons', (prev) => prev.filter((_, i) => i !== index))
+        },
+        select: (index, isSelected) => setStore('icons', (prev) => prev.map((icon, i) => i === index ? { ...icon, isSelected } : icon)),
+        selectAll: () => setStore('icons', (prev) => prev.map((icon) => ({ ...icon, isSelected: true }))),
+        cancelSelect: () => setStore('icons', (prev) => prev.map((icon) => ({ ...icon, isSelected: false }))),
 
-export const placeIcon = (index: number, x: number, y: number) => {
-    const {col, row} = pos2Grid(x, y);
-    const gridPos = grid2Pos(col, row);
-    const iconIndex = findIconIndexByGrid(col, row);
-    if (iconIndex === -1) {
-        setWorkspaceState('icons', index, {
-            ...workspaceState.icons[index],
-            col,
-            row,
-            x: gridPos.x,
-            y: gridPos.y
-        });
-    } else {
-        const p = findAvailablePlace(index, x, y);
-        if (p) {
-            const gridPos = grid2Pos(p.col, p.row);
-            setWorkspaceState('icons', index, {
-                ...workspaceState.icons[index],
-                col: p.col,
-                row: p.row,
-                x: gridPos.x,
-                y: gridPos.y
+        getNextPosByIndex: () => {
+            const { dis, maxCol, maxRow, gridMap } = createGridMap();
+            store.icons.forEach((icon) => {
+                const gridPos = icon.pos.toGrid();
+                gridMap[gridPos.row][gridPos.col] = true;
             });
-        } else throw new Error('No where could place icon'); // TODO
-    }
-};
 
-const findAvailablePlace = (index: number, x: number, y: number) => {
-    const screen = displayState;
-    const {col, row} = workspaceState.icons[index];
-    const positions = [];
-    const maxCol = Math.floor(screen.width / (IconWidth + IconMargin));
-    const maxRow = Math.floor((screen.height - 44) / (IconHeight + IconMargin));
-    for (let i = 0; i < maxCol; i++) {
-        for (let j = 0; j < maxRow; j++) {
-            if ((i === col && j === row) || findIconIndexByGrid(i, j) === -1) {
-                positions.push({col: i, row: j});
+            for (let col = 0; col < maxCol; col++) {
+                for (let row = 0; row < maxRow; row++) {
+                    if (!gridMap[row][col]) {
+                        return makeGridPos(col, row);
+                    }
+                }
             }
-        }
-    }
+            throw new Error('No available position');
+        },
+        findClosestPos: (pos) => {
+            const { dis, maxCol, maxRow, gridMap } = createGridMap();
+            store.icons.forEach((icon) => {
+                const gridPos = icon.pos.toGrid();
+                gridMap[gridPos.row][gridPos.col] = true;
+            });
 
-    positions.sort((a, b) => {
-        const posA = grid2Pos(a.col, a.row);
-        const posB = grid2Pos(b.col, b.row);
-        const distA = Math.hypot(posA.x - x, posA.y - y);
-        const distB = Math.hypot(posB.x - x, posB.y - y);
-        return distA - distB;
+            const gridPos = pos.toGrid();
+            if (!gridMap[gridPos.row][gridPos.col]) {
+                return gridPos;
+            }
+
+            let minDis = Infinity;
+            let closestPos = gridPos;
+            for (let col = 0; col < maxCol; col++) {
+                for (let row = 0; row < maxRow; row++) {
+                    if (!gridMap[row][col]) {
+                        const dx = col * dis - pos.x;
+                        const dy = row * dis - pos.y;
+                        const d = dx * dx + dy * dy;
+                        if (d < minDis) {
+                            minDis = d;
+                            closestPos = makeGridPos(col, row);
+                        }
+                    }
+                }
+            }
+            return closestPos;
+        }
     });
 
-    return positions.length > 0 ? positions[0] : null;
-};
+    return store;
+}
+

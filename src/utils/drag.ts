@@ -89,4 +89,5 @@ export const useDragWithLastPos = (
             setLastPos({x, y});
         }
     })
+    return { isDragging };
 }

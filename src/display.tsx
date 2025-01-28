@@ -8,28 +8,30 @@ interface DisplayState {
     height: number;
     backgroundImage?: string;
     backgroundColor?: string;
+
+    resize: (width: number, height: number) => void;
 }
 
-const [displayState, setDisplayState] = createStore<DisplayState>({
+const [displayStore, setDisplayStore] = createStore<DisplayState>({
     width: 1024,
     height: 768,
     backgroundImage: '/wallpapers/light/1024x768.png',
+
+    resize: (width, height) => {
+        setDisplayStore({ width, height });
+    }
 });
 
-export { displayState, setDisplayState };
-
-export const resize = (width: number, height: number) => {
-    setDisplayState({ width, height });
-};
+export { displayStore, setDisplayStore };
 
 export const Display = () => {
     return (
         <div style={{
-            "min-height": `${displayState.height}px`,
-            "min-width": `${displayState.width}px`,
+            "min-height": `${displayStore.height}px`,
+            "min-width": `${displayStore.width}px`,
             "z-index": '0',
             position: 'relative',
-            background: displayState.backgroundImage ? `url(${displayState.backgroundImage})` : displayState.backgroundColor,
+            background: displayStore.backgroundImage ? `url(${displayStore.backgroundImage})` : displayStore.backgroundColor,
             border: '0.1px solid black',
             perspective: '1000px',
         }} id="display">

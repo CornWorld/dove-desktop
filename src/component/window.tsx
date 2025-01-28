@@ -1,8 +1,8 @@
 import { createStore, produce } from "solid-js/store";
 import {onMount, onCleanup, Component, JSX, createSignal, createEffect} from "solid-js";
-import { displayState } from "@/display";
+import { displayStore } from "@/display";
 import {useDrag, useDragWithLastPos} from "@/utils/drag";
-import { setWorkspaceState } from "@/workspace/store";
+import { setWorkspaceStore } from "@/workspace/store";
 import { setTaskWindowId } from "@/workspace/taskmanager";
 
 import './window.scss';
@@ -43,7 +43,7 @@ export interface WindowStore extends WindowState, WindowHandler {
 }
 
 const rePos = (state: WindowState, x: number, y: number) => {
-    const screen = displayState;
+    const screen = displayStore;
     if (x < 0) {
         x = 0;
     } else if (x + state.width > screen.width) {
@@ -57,9 +57,9 @@ const rePos = (state: WindowState, x: number, y: number) => {
 
     // check window's position. if it's too close to the edge, float the panel
     if (screen.height - y - state.height < 44 + 7) {
-        setWorkspaceState('panelFloat', false);
+        setWorkspaceStore('panelFloat', false);
     } else {
-        setWorkspaceState('panelFloat', true);
+        setWorkspaceStore('panelFloat', true);
     }
     return {x, y};
 };
@@ -82,15 +82,15 @@ export const createWindowStore = (initialState: WindowState) => {
                 s.status = 'maximized';
                 s.x = 0;
                 s.y = 0;
-                s.width = displayState.width;
-                s.height = displayState.height;
+                s.width = displayStore.width;
+                s.height = displayStore.height;
             }));
         },
         minimize: () => {
             setState(produce((s) => {
                 s.status = 'minimized';
                 s.x = 0;
-                s.y = displayState.height + 100;
+                s.y = displayStore.height + 100;
             }));
         },
         close: () => {

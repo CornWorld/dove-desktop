@@ -1,4 +1,3 @@
-import { createDragState, DragState } from "@/utils/drag";
 import { IconStore, createIconStore } from "@/workspace/icon";
 import { createStore } from "solid-js/store";
 import { WindowState, WindowHandler } from "@/component/window";
@@ -20,31 +19,20 @@ function createWindowManagerStore() {
 	return state;
 }
 
-interface WorkspaceState extends IconStore, WindowManagerStore {
+interface WorkspaceState extends WindowManagerStore {
 	// TODO move to panel store
 	panelFloat: boolean;
 	setPanelFloat: (float: boolean) => void;
-	
-	iconDrag: DragState;
-	windowDrag: DragState;
 }
 
-const emptyDragState: DragState = {
-	offsetX: 0,
-	offsetY: 0,
-	dragging: 0
-};
-
-const [workspaceState, setWorkspaceState] = createStore<WorkspaceState>({
-	...createIconStore(),
+const [workspaceStore, setWorkspaceStore] = createStore<WorkspaceState>({
 	...createWindowManagerStore(),
 	
 	panelFloat: false,
-	setPanelFloat: (float) => setWorkspaceState('panelFloat', float),
-	
-	iconDrag: emptyDragState,
-	windowDrag: emptyDragState
+	setPanelFloat: (float) => setWorkspaceStore('panelFloat', float),
 });
+
+export const iconStore = createIconStore();
 
 // Initialize drags after store creation since they need the setter
 // const iconDrag = createDragState(setWorkspaceState, 'iconDrag');
@@ -54,4 +42,4 @@ const [workspaceState, setWorkspaceState] = createStore<WorkspaceState>({
 // setWorkspaceState('windowDrag', windowDrag);
 // TODO
 
-export { workspaceState, setWorkspaceState };
+export { workspaceStore, setWorkspaceStore };
