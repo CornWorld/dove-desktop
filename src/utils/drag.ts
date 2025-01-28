@@ -1,9 +1,9 @@
 import {createSignal, onCleanup, onMount} from "solid-js";
 
-const debug = true;
+const debug = false;
 
 export interface UseDragOptions {
-	allowDrag: boolean | (() => boolean);
+	allowDrag?: boolean | (() => boolean);
 	delay?: number; // px. default 0. circle radius to start dragging
 
 }
@@ -15,6 +15,7 @@ export const useDrag = (
 ) => {
 
 	options ??= {allowDrag: true};
+	options.allowDrag ??= true;
 
 	const [isPointerDown, setPointerDown] = createSignal(false);
 	const [isDragging, setIsDragging] = createSignal(false);
