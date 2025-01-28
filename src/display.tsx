@@ -1,5 +1,5 @@
 import {Workspace} from "@/workspace";
-import {createSignal, Suspense} from "solid-js";
+import {createSignal, onCleanup, Suspense} from "solid-js";
 import {createStore} from "solid-js/store";
 import {Settings} from "@/app/settings";
 
@@ -37,6 +37,20 @@ export const transPos = (x: number, y: number) => {
 }
 
 export const Display = () => {
+    let localRef: HTMLDivElement | null = null; // hack for HMR
+
+    const setLocalRef = (element: HTMLDivElement) => {
+        setRef(element);
+        localRef = element;
+    };
+
+    onCleanup(() => {
+        if (localRef) {
+            localRef = null;
+            setRef();
+        }
+    });
+
 	return (
 		<div style={{
 			"min-height": `${displayStore.height}px`,
@@ -46,7 +60,7 @@ export const Display = () => {
 			background: displayStore.backgroundImage ? `url(${displayStore.backgroundImage})` : displayStore.backgroundColor,
 			border: '0.1px solid black',
 			perspective: '1000px',
-		}} id="display" ref={setRef}>
+		}} id="display" ref={setLocalRef}>
 			<Suspense fallback={<></>}>
 				{/* TODO Loading screen*/}
 				<Workspace/>

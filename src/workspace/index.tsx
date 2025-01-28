@@ -5,34 +5,47 @@ import {DigitalClock} from "@/workspace/digital-clock";
 import './index.scss';
 import {iconStore, workspaceStore} from "@/workspace/store";
 import {Icon} from "@/workspace/icon";
-import {createEffect, createSignal, For, on, onMount, untrack} from "solid-js";
+import {createEffect, createSignal, For, on, onCleanup, onMount, untrack} from "solid-js";
 import {exampleDesktopFiles} from "@/utils/files";
 import {useDrag} from "@/utils/drag";
+import {RubberBandSelector} from "@/workspace/rubber-band-selector";
 
 export const Workspace = () => {
 	const [iconsRef, setIconsRef] = createSignal<HTMLElement>();
+
+    const selectorDefault = {isShown: false, from: {x: 0, y: 0}, to: {x: 0, y: 0}};
+    const [selector, setSelector] = createSignal(selectorDefault);
+
+    const onPointerDown = (e:PointerEvent) => {
+        const {clientX, clientY} = transEventPos(e);
+        const clicked = iconStore.getClicked(clientX, clientY);
+        if(clicked == -1) {
+            iconStore.cancelSelect();
+        } else {
+            // TODO add shift key to select multiple icons
+            iconStore.cancelSelect();
+            iconStore.select(clicked, true);
+        }
+    };
 
 	onMount(() => {
 		exampleDesktopFiles.forEach((f) => {
 			iconStore.add(f.name, f.icon);
 		});
 
-		iconsRef()!.addEventListener('pointerdown', (e) => {
-			const {clientX, clientY} = transEventPos(e);
-			const clicked = iconStore.getClicked(clientX, clientY);
-			console.log(e.clientX, e.clientY, clientX, clientY, clicked);
-			if(clicked == -1) {
-				iconStore.cancelSelect();
-			} else {
-				iconStore.select(clicked, true);
-			}
-		});
+		iconsRef()!.addEventListener('pointerdown', onPointerDown);
+        onCleanup(() => iconsRef()?.removeEventListener('pointerdown', onPointerDown));
 
 		const [last, setLast] = createSignal({x: 0, y: 0});
 
 		const dragNotify = (dx: number, dy: number) => {
 			const map: Record<string, (dx: number, dy: number) => void> = {
-				none: () => {
+				none: (dx: number, dy: number) => {
+                    setSelector({
+                        isShown: true,
+                        from: transPos(offset().x, offset().y),
+                        to: transPos(offset().x + dx, offset().y + dy)
+                    });
 				},
 				move: (dx, dy) => {
 					untrack(() => iconStore.drag(dx - last().x, dy - last().y));
@@ -63,7 +76,9 @@ export const Workspace = () => {
 						return;
 					}
 				}
-			}
+			} else {
+                setSelector(selectorDefault);
+            }
 			setDragNotifySwitch('none');
 		}));
 	});
@@ -83,6 +98,7 @@ export const Workspace = () => {
 				"z-index": 1,
 				"pointer-events": "all"
 			}} ref={setIconsRef}>
+                {selector().isShown && <RubberBandSelector from={selector().from} to={selector().to} />}
 				<For each={iconStore.icons}>
 					{(icon) => (
 						<Icon {...icon} />
