@@ -14,8 +14,15 @@ interface Task {
 	x: number;
 }
 
-interface TaskManagerState {
+interface TaskStore {
 	tasks: Task[];
+
+	setPosition: (index: number, x: number) => void;
+	setActive: (index: number, active: boolean) => void;
+	swapPosition: (index1: number, index2: number) => void;
+	setTooltipVisible: (index: number, visible: boolean) => void;
+	setWindowId: (index: number, windowId: string | null) => void;
+	makeToPosition: (index: number, towardsX: number) => void;
 }
 
 const initialTasks: Task[] = [{
@@ -48,167 +55,63 @@ const initialTasks: Task[] = [{
 }];
 
 
-const [taskState, setTaskState] = createStore<TaskManagerState>({
+const [taskStore, setTaskStore] = createStore<TaskStore>({
 	tasks: initialTasks,
 
+	setPosition: (index: number, x: number) => {
+		setTaskStore('tasks', index, produce((task) => {
+			task.x = x;
+		}));
+	},
+	setActive: (index: number, active: boolean) => {
+		setTaskStore('tasks', index, produce((task) => {
+			task.active = active;
+		}));
+	},
+	swapPosition: (index1: number, index2: number) => {
+		setTaskStore('tasks', produce((tasks) => {
+			const temp = tasks[index1].x;
+			tasks[index1].x = tasks[index2].x;
+			tasks[index2].x = temp;
+		}));
+	},
+	setTooltipVisible: (index: number, visible: boolean) => {
+		setTaskStore('tasks', index, produce((task) => {
+			task.tooltipVisible = visible;
+		}));
+	},
+	setWindowId: (index: number, windowId: string | null) => {
+		setTaskStore('tasks', index, produce((task) => {
+			task.windowId = windowId;
+		}));
+	},
+
+	makeToPosition: (index: number, towardsX: number) => {
+		const currX = taskStore.tasks[index].x;
+		if(currX === towardsX) return;
+
+		const list = taskStore.tasks
+			.map((task, i) => ({x: task.x, i}))
+			.sort((a, b) => a.x - b.x);
+
+		const swapAndShift = (start: number, end: number, shift: number) => {
+			for (let i = start; i !== end; i += shift) {
+				taskStore.setPosition(list[i].i, i - shift);
+			}
+		};
+
+		taskStore.swapPosition(list[currX].i, list[towardsX].i);
+		if(currX < towardsX) {
+			swapAndShift(currX + 1, towardsX + 1, 1);
+		} else {
+			swapAndShift(currX - 1, towardsX - 1, -1);
+		}
+	},
 });
 
-export {taskState, setTaskState};
-
-export const setTaskWindowId = (index: number, windowId: string | null) => {
-	setTaskState('tasks', index, produce((task) => {
-		task.windowId = windowId;
-		if(windowId === null) {
-			task.active = false;
-			task.isWindow = false;
-		}
-	}));
-};
-
-const setTaskTooltipVisible = (index: number, visible: boolean) => {
-	setTaskState('tasks', index, produce((task) => {
-		task.tooltipVisible = visible;
-	}));
-};
-
-const setTaskPosition = (index: number, x: number) => {
-	setTaskState('tasks', index, produce((task) => {
-		task.x = x;
-	}));
-};
-
-const swapTaskPosition = (index1: number, index2: number) => {
-	setTaskState('tasks', produce((tasks) => {
-		const temp = tasks[index1].x;
-		tasks[index1].x = tasks[index2].x;
-		tasks[index2].x = temp;
-	}));
-};
-
-const setTaskActive = (index: number, active: boolean) => {
-	setTaskState('tasks', index, produce((task) => {
-		task.active = active;
-	}));
-};
+export {taskStore, setTaskStore};
 
 const taskWidth = 52, taskGap = 2;
-
-const makeTaskToPosition = (index: number, towardsX: number) => {
-	const currX = taskState.tasks[index].x;
-	if(currX === towardsX) return;
-
-	const list = taskState.tasks
-		.map((task, i) => ({x: task.x, i}))
-		.sort((a, b) => a.x - b.x);
-
-	const swapAndShift = (start: number, end: number, shift: number) => {
-		for (let i = start; i !== end; i += shift) {
-			setTaskPosition(list[i].i, i - shift);
-		}
-	};
-
-	swapTaskPosition(list[currX].i, list[towardsX].i);
-	if(currX < towardsX) {
-		swapAndShift(currX + 1, towardsX + 1, 1);
-	} else {
-		swapAndShift(currX - 1, towardsX - 1, -1);
-	}
-};
-
-// const defaultLastMouseDownState = {
-// 	index: -1,
-// 	time: -1,
-// };
-// let lastMouseDownState = defaultLastMouseDownState;
-
-// const onMouseMove = (e: MouseEvent) => {
-// 	if(taskState.drag.dragging) {
-// 		lastMouseDownState = defaultLastMouseDownState;
-// 		const icon = document.getElementById('dragging-icon');
-// 		if(!icon) return;
-// 		icon.style.display = 'block';
-// 		icon.style.position = 'absolute';
-//
-// 		const x = e.clientX + 10, y = e.clientY + 20;
-//
-// 		icon.style.left = x + 'px';
-// 		icon.style.top = y + 'px';
-//
-// 		const index = taskState.drag.dragging - 1;
-// 		// check x,y in the task manager
-// 		const taskManager = document.querySelector('.task-manager') as HTMLElement;
-// 		if(!taskManager) return;
-// 		const rect = taskManager.getBoundingClientRect();
-// 		if(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) return;
-// 		// check x could be placed
-// 		const leftDis = x - rect.left;
-// 		let towardsX = Math.floor(leftDis / (taskWidth + taskGap));
-// 		if(towardsX >= taskState.tasks.length) towardsX = taskState.tasks.length - 1;
-//
-// 		makeTaskToPosition(index, towardsX);
-// 	}
-// };
-//
-// const onMouseUp = () => {
-// 	if(taskState.drag.dragging) {
-// 		const index = taskState.drag.dragging - 1;
-// 		const task = taskState.tasks[index];
-//
-// 		if(lastMouseDownState !== defaultLastMouseDownState) {
-// 			const time = new Date().getTime();
-// 			if(time - lastMouseDownState.time < 200) {
-// 				if(task.windowId) {
-// 					const event = new Event('clickTaskIcon');
-// 					document.getElementById(task.windowId)?.dispatchEvent(event);
-// 				}
-// 			}
-// 		}
-// 		lastMouseDownState = defaultLastMouseDownState;
-// 		document.getElementById('dragging-icon')?.remove();
-// 		window.removeEventListener('mousemove', onMouseMove);
-// 		window.removeEventListener('mouseup', onMouseUp);
-//
-// 		// Keep task active if it's a window and was previously active
-// 		setTaskActive(index, task.isWindow && task.active);
-// 		setTaskState('drag', emptyDragState);
-// 	}
-// };
-//
-// const onMouseDown = (e: MouseEvent) => {
-// 	e.preventDefault();
-// 	e.stopPropagation();
-//
-// 	let ele = e.target as HTMLElement;
-// 	if(ele.tagName === 'UL') return;
-// 	while (ele.tagName !== 'LI') {
-// 		if(ele.parentElement) ele = ele.parentElement;
-// 	}
-//
-// 	const x = parseInt(getComputedStyle(ele).getPropertyValue('--x'));
-// 	const index = taskState.tasks.findIndex((task) => task.x === x);
-//
-// 	// add an icon clone along with the mouse
-// 	const icon = ele.querySelector('span')?.cloneNode(true) as HTMLElement;
-//
-// 	icon.style.display = 'none';
-// 	icon.id = 'dragging-icon';
-// 	document.body.appendChild(icon);
-//
-// 	lastMouseDownState = {
-// 		index,
-// 		time: new Date().getTime(),
-// 	};
-//
-// 	setTaskState('drag', {
-// 		offsetX: 0,
-// 		offsetY: taskState.tasks[index].active ? 1 : 0,
-// 		dragging: index + 1
-// 	});
-//
-// 	setTaskActive(index, true);
-// 	window.addEventListener('mousemove', onMouseMove);
-// 	window.addEventListener('mouseup', onMouseUp);
-// };
 
 export const TaskManager = () => {
 	const [ref, setRef] = createSignal<HTMLElement>();
@@ -217,15 +120,15 @@ export const TaskManager = () => {
 
 	onMount(() => {
 		// rearrange pos
-		for (let i = 0; i < taskState.tasks.length; i++) {
-			setTaskPosition(i, i);
+		for (let i = 0; i < taskStore.tasks.length; i++) {
+			taskStore.setPosition(i, i);
 		}
 	})
 
 	const getClicked = (x: number, y: number): number => {
 		const rect = ref()!.getBoundingClientRect();
 		if(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) return -1;
-		return Math.min(Math.floor((x - rect.left) / (taskWidth + taskGap)), taskState.tasks.length - 1);
+		return Math.min(Math.floor((x - rect.left) / (taskWidth + taskGap)), taskStore.tasks.length - 1);
 	}
 
 	onMount(() => {
@@ -240,9 +143,8 @@ export const TaskManager = () => {
 			style.display = 'block';
 
 			const overIndex = getClicked(offset().x + dx, offset().y + dy);
-			console.log(overIndex);
 			if(overIndex === -1) return;
-			makeTaskToPosition(draggingIconIndex(), overIndex);
+			taskStore.makeToPosition(draggingIconIndex(), overIndex);
 		}, {
 			delay: 10,
 		});
@@ -276,20 +178,20 @@ export const TaskManager = () => {
 			const index = getClicked(e.clientX, e.clientY);
 			if(index === -1) return;
 
-			const task = taskState.tasks[index];
+			const task = taskStore.tasks[index];
 
-			setTaskActive(index, !task.active);
+			taskStore.setActive(index, !task.active);
 		});
 	});
 
 	return (
 		<ul class="task-manager" ref={setRef}>
-			<For each={taskState.tasks}>
+			<For each={taskStore.tasks}>
 				{(task, index) => (
 					<li class={task.active ? 'active' : task.isWindow ? 'inactive' : ''}
 					    style={{"--x": task.x}}
-					    onMouseEnter={() => setTaskTooltipVisible(index(), true)}
-					    onMouseLeave={() => setTaskTooltipVisible(index(), false)}
+					    onMouseEnter={() => taskStore.setTooltipVisible(index(), true)}
+					    onMouseLeave={() => taskStore.setTooltipVisible(index(), false)}
 					>
                         <span style={{
 	                        display: 'inline-block',

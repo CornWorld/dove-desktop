@@ -3,7 +3,7 @@ import {Component, createEffect, createSignal, JSX, onCleanup, onMount, untrack}
 import {displayStore} from "@/display";
 import {useDrag} from "@/utils/drag";
 import {setWorkspaceStore} from "@/workspace/store";
-import {setTaskWindowId} from "@/workspace/taskmanager";
+import {taskStore} from "@/workspace/taskmanager";
 
 import './window.scss';
 
@@ -105,7 +105,7 @@ export const createWindowStore = (initialState: WindowState) => {
 		},
 		close: () => {
 			document.getElementById(state.id)?.remove();
-			setTaskWindowId(0, null);
+			taskStore.setWindowId(0, null);
 		},
 		onClickTaskIcon: () => {
 			if(state.status === 'minimized' && state.originInfo) {
