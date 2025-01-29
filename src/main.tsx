@@ -1,6 +1,5 @@
 import {render} from 'solid-js/web'
 import {Display} from "@/display";
-
 import './global.css'
 import './breeze.scss'
 

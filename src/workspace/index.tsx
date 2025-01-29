@@ -1,24 +1,59 @@
-import {transEventPos, transPos} from "@/display";
 import {TaskManager} from "@/workspace/taskmanager";
 import {AppLauncher} from "@/workspace/app-launcher";
 import {DigitalClock} from "@/workspace/digital-clock";
 import './index.scss';
-import {iconStore, workspaceStore} from "@/workspace/store";
 import {Icon} from "@/workspace/icon";
-import {createEffect, createSignal, For, on, onCleanup, onMount, untrack} from "solid-js";
+import {createEffect, createSignal, For, on, onCleanup, onMount, untrack, useContext} from "solid-js";
 import {exampleDesktopFiles} from "@/utils/files";
 import {useDrag} from "@/utils/drag";
 import {RubberBandSelector} from "@/workspace/rubber-band-selector";
+import {createIconStore} from "@/workspace/icon";
+import {createStore} from "solid-js/store";
+import {WindowHandler, WindowState} from "@/component/window";
+import {DisplayContext} from "@/display";
+
+type Window = WindowState & WindowHandler;
+
+interface WindowManagerStore {
+	window: Window[];
+	addWindow: (window: WindowState & WindowHandler) => void;
+	removeWindow: (id: string) => void;
+}
+
+function createWindowManagerStore() {
+	const [state, setState] = createStore<WindowManagerStore>({
+		window: [],
+		addWindow: (window) => setState('window', (prev) => [...prev, window]),
+		removeWindow: (id) => setState('window', (prev) => prev.filter((w) => w.id !== id))
+	});
+	return state;
+}
+
+interface WorkspaceState extends WindowManagerStore {
+	// TODO move to panel store
+	panelFloat: boolean;
+	setPanelFloat: (float: boolean) => void;
+}
 
 export const Workspace = () => {
+	const [workspaceStore, setWorkspaceStore] = createStore<WorkspaceState>({
+		...createWindowManagerStore(),
+	
+		panelFloat: false,
+		setPanelFloat: (float) => setWorkspaceStore('panelFloat', float),
+	});
+	
+	const iconStore = createIconStore();
 	const [iconsRef, setIconsRef] = createSignal<HTMLElement>();
+
+	const display = useContext(DisplayContext)!;
 
     const selectorDefault = {isShown: false, from: {x: 0, y: 0}, to: {x: 0, y: 0}};
     const [selector, setSelector] = createSignal(selectorDefault);
 
     const onPointerDown = (e:PointerEvent) => {
-        const {clientX, clientY} = transEventPos(e);
-        const clicked = iconStore.getClicked(clientX, clientY);
+        const {x, y} = display.transEventPos(e);
+        const clicked = iconStore.getClicked(x, y);
         if(clicked == -1) {
             iconStore.cancelSelect();
         } else {
@@ -43,8 +78,8 @@ export const Workspace = () => {
 				none: (dx: number, dy: number) => {
                     setSelector({
                         isShown: true,
-                        from: transPos(offset().x, offset().y),
-                        to: transPos(offset().x + dx, offset().y + dy)
+                        from: display.transPos(offset().x, offset().y),
+                        to: display.transPos(offset().x + dx, offset().y + dy)
                     });
 				},
 				move: (dx, dy) => {
@@ -55,13 +90,13 @@ export const Workspace = () => {
 			map[dragNotifySwitch()](dx, dy);
 		}
 
-		const [dragNotifySwitch, setDragNotifySwitch] = createSignal("none");
+		const [dragNotifySwitch, setDragNotifySwitch] = createSignal('none');
 		const {isDragging, offset} = useDrag(iconsRef()!, dragNotify);
 
 		createEffect(on(isDragging, (dragging) => {
 			if(dragging) {
 				// calc whether the pointer is on the icons
-				const {x, y} = transPos(offset().x, offset().y);
+				const {x, y} = display.transPos(offset().x, offset().y);
 				const clicked = iconStore.getClicked(x, y);
 				if(clicked != -1) {
 					const selected = iconStore.icons
@@ -77,7 +112,10 @@ export const Workspace = () => {
 					}
 				}
 			} else {
-                setSelector(selectorDefault);
+				if(dragNotifySwitch() === 'none') setSelector(selectorDefault);
+				if(dragNotifySwitch() === 'move') {
+					iconStore.drop();
+				}
             }
 			setDragNotifySwitch('none');
 		}));

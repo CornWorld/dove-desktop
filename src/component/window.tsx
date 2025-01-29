@@ -1,11 +1,10 @@
 import {createStore, produce} from "solid-js/store";
-import {Component, createEffect, createSignal, JSX, onCleanup, onMount, untrack} from "solid-js";
-import {displayStore} from "@/display";
+import {Component, createEffect, createSignal, JSX, onCleanup, onMount, untrack, useContext} from "solid-js";
 import {useDrag} from "@/utils/drag";
-import {setWorkspaceStore} from "@/workspace/store";
 import {taskStore} from "@/workspace/taskmanager";
 
 import './window.scss';
+import {DisplayContext, DisplayStore} from "@/display";
 
 export interface WindowState {
 	title: string;
@@ -42,29 +41,34 @@ export interface WindowStore extends WindowState, WindowHandler {
 	onDBClick: (e: MouseEvent) => void;
 }
 
-const rePos = (state: WindowState, x: number, y: number) => {
-	const screen = displayStore;
+const rePos = (state: WindowState, display: DisplayStore, x: number, y: number) => {
 	if(x < 0) {
 		x = 0;
-	} else if(x + state.width > screen.width) {
-		x = screen.width - state.width;
+	} else if(x + state.width > display.width) {
+		x = display.width - state.width;
 	}
 	if(y < 0) {
 		y = 0;
-	} else if(y + state.height > screen.height) {
-		y = screen.height - state.height;
+	} else if(y + state.height > display.height) {
+		y = display.height - state.height;
 	}
 
 	// check window's position. if it's too close to the edge, float the panel
-	if(screen.height - y - state.height < 44 + 7) {
-		setWorkspaceStore('panelFloat', false);
-	} else {
-		setWorkspaceStore('panelFloat', true);
-	}
+	// TODO use event listener instead of polling
+	// if(display.height - y - state.height < 44 + 7) {
+	// 	setWorkspaceStore('panelFloat', false);
+	// } else {
+	// 	setWorkspaceStore('panelFloat', true);
+	// }
 	return {x, y};
 };
 
 export const createWindowStore = (initialState: WindowState) => {
+	const display = useContext(DisplayContext);
+
+	if(!display) {
+		throw new Error('DisplayContext not found');
+	}
 	const [state, setState] = createStore<WindowStore>({
 		...initialState,
 		originInfo: {
@@ -92,15 +96,15 @@ export const createWindowStore = (initialState: WindowState) => {
 				s.status = 'maximized';
 				s.x = 0;
 				s.y = 0;
-				s.width = displayStore.width;
-				s.height = displayStore.height;
+				s.width = display.width;
+				s.height = display.height;
 			}));
 		},
 		minimize: () => {
 			setState(produce((s) => {
 				s.status = 'minimized';
 				s.x = 0;
-				s.y = displayStore.height + 100;
+				s.y = display.height + 100;
 			}));
 		},
 		close: () => {
@@ -148,6 +152,8 @@ export const Window: Component<WindowProps> = (props) => {
 	const [windowRef, setWindowRef] = createSignal<HTMLElement>();
 	const [titlebarRef, setTitlebarRef] = createSignal<HTMLElement>();
 
+	const display = useContext(DisplayContext)!;
+
 	onMount(() => {
 		windowRef()!.addEventListener('clickTaskIcon', props.store.onClickTaskIcon);
 		windowRef()!.addEventListener('dblclick', props.store.onDBClick);
@@ -162,6 +168,7 @@ export const Window: Component<WindowProps> = (props) => {
 			const {x: startX, y: startY} = lastPos();
 			const {x: newX, y: newY} = rePos(
 				props.store,
+				display,
 				startX + dx,
 				startY + dy
 			);

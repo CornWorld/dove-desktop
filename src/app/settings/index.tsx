@@ -5,29 +5,27 @@ import './settings.scss';
 import {createWindowStore, Window} from "@/component/window";
 import {QuickSettings} from "./quick-settings";
 
-const [windowState] = createWindowStore({
-	title: 'Window 1',
-	description: 'Window 1 description',
-	icon: '/icons/apps/systemsettings.svg',
-	id: 'window1',
-	active: true,
-	height: 675,
-	width: 931,
-	x: 80,
-	y: 35,
-	z: 3,
-	// status: 'normal',
-	status: 'minimized',
-	originInfo: {
-		x: 80,
-		y: 45,
-		width: 931,
-		height: 675,
-	},
-});
-
 export const Settings = () => {
 	const [headerbarWidth, setHeaderbarWidth] = createSignal(270);
+	const [windowState] = createWindowStore({
+		title: 'Window 1',
+		description: 'Window 1 description',
+		icon: '/icons/apps/systemsettings.svg',
+		id: 'window1',
+		active: true,
+		height: 675,
+		width: 931,
+		x: 80,
+		y: 35,
+		z: 3,
+		status: 'normal',
+		originInfo: {
+			x: 80,
+			y: 45,
+			width: 931,
+			height: 675,
+		},
+	});
 
 	const sidebarSelections: SidebarSelection[] = [
 		{
