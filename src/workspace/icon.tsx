@@ -139,11 +139,12 @@ export function createIconStore() {
 				...icon,
 				isSelected
 			} : icon)),
-		selectAll: () => setStore('icons', (prev) =>
-			prev.map((icon) => ({...icon, isSelected: true}))),
-		cancelSelect: () => setStore('icons', (prev) =>
-			prev.map((icon) => ({...icon, isSelected: false}))),
-
+		selectAll: () => setStore('icons', produce(icon => {
+			icon.forEach((i) => i.isSelected = true);
+		})),
+		cancelSelect: () => setStore('icons', produce(icon => {
+			icon.forEach((i) => i.isSelected = false);
+		})),
 		getNextPosByIndex: () => {
 			const {maxCol, maxRow, gridMap} = createGridMap();
 			store.icons.forEach((icon) => {
