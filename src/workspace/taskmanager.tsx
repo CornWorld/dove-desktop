@@ -131,6 +131,11 @@ export const TaskManager = () => {
 		return Math.min(Math.floor((x - rect.left) / (taskWidth + taskGap)), taskStore.tasks.length - 1);
 	}
 
+	const getClickedIndex = (x: number, y:number): number => {
+		const posIndex = getClicked(x, y);
+		return taskState.tasks.findIndex(t => t.x == posIndex);
+	}
+
 	onMount(() => {
 		const {isDragging, offset} = useDrag(ref()!, (dx, dy) => {
 			const style = draggingIcon()!.style;
@@ -175,7 +180,7 @@ export const TaskManager = () => {
 
 	onMount(() => {
 		ref()!.addEventListener('click', (e) => {
-			const index = getClicked(e.clientX, e.clientY);
+			const index = getClickedIndex(e.clientX, e.clientY);
 			if(index === -1) return;
 
 			const task = taskStore.tasks[index];

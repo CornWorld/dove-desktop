@@ -176,22 +176,17 @@ export function createIconStore(enableGrid = true): IconStore {
 					gridMap[gridPos.row][gridPos.col] = -1;
 				}));
 		},
-		select: (index: number, isSelected: boolean) => {
-			setStore('icons', (prev) =>
-				prev.map((icon, i) => i === index ? {
-					...icon,
-					isSelected
-				} : icon));
-		},
-		selectAll: () => {
-			setStore('icons', (prev) =>
-				prev.map((icon) => ({...icon, isSelected: true})));
-		},
-		cancelSelect: () => {
-			setStore('icons', (prev) =>
-				prev.map((icon) => ({...icon, isSelected: false})));
-		},
-
+		select: (index, isSelected) => setStore('icons', (prev) =>
+			prev.map((icon, i) => i === index ? {
+				...icon,
+				isSelected
+			} : icon)),
+		selectAll: () => setStore('icons', produce(icon => {
+			icon.forEach((i) => i.isSelected = true);
+		})),
+		cancelSelect: () => setStore('icons', produce(icon => {
+			icon.forEach((i) => i.isSelected = false);
+		})),
 		getNextPosByIndex: () => {
 			for (let col = 0; col < maxCol; col++) {
 				for (let row = 0; row < maxRow; row++) {

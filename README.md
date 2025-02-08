@@ -11,7 +11,15 @@ This is a web page version system desktop, with the design, the icons, and so on
   - TypeScript
   - ESLint
 
-> Note: The React version of this project is available under [tag `v0.1`](https://github.com/CornWorld/Dove-Desktop/tree/v0.1)
+## TODO
+- [ ] Implement `FrameWindow` component
+- [ ] Add simple window manage system which supports `addWindow` `removeWindow` and `modifyWindow` via window handle
+- [ ] Use stuffs like `addWindow` to refactor `Settings` window
+
+## Old versions
+### React
+Available under [tag `v0.1`](https://github.com/CornWorld/Dove-Desktop/tree/v0.1)
+
 
 ## References
 Wallpapers: Next / Nexus from Plasma6 Breeze Light (Author: [Krystian Zajdel](mailto:krystian.zajdel@gmail.com))  

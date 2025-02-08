@@ -54,11 +54,12 @@ export const Workspace = () => {
     const onPointerDown = (e:PointerEvent) => {
         const {x, y} = display.transEventPos(e);
         const clicked = iconStore.getClicked(x, y);
+	    const hasSelected = iconStore.icons.some(i => i.isSelected);
         if(clicked == -1) {
             iconStore.cancelSelect();
         } else {
             // TODO add shift key to select multiple icons
-            iconStore.cancelSelect();
+            if(hasSelected) iconStore.cancelSelect();
             iconStore.select(clicked, true);
         }
     };
@@ -136,13 +137,13 @@ export const Workspace = () => {
 				"z-index": 1,
 				"pointer-events": "all"
 			}} ref={setIconsRef}>
-                {selector().isShown && <RubberBandSelector from={selector().from} to={selector().to} />}
 				<For each={iconStore.icons}>
 					{(icon) => (
 						<Icon {...icon} />
 					)}
 				</For>
 			</div>
+			{selector().isShown && <RubberBandSelector from={selector().from} to={selector().to} />}
 		</div>
 	);
 }
