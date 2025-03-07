@@ -133,7 +133,7 @@ export const TaskManager = () => {
 
 	const getClickedIndex = (x: number, y:number): number => {
 		const posIndex = getClicked(x, y);
-		return taskState.tasks.findIndex(t => t.x == posIndex);
+		return taskStore.tasks.findIndex(t => t.x == posIndex);
 	}
 
 	onMount(() => {
