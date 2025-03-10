@@ -1,10 +1,11 @@
-import {Component, JSX, createSignal, onMount, onCleanup} from "solid-js";
+import {Component, JSX, createSignal, onMount, onCleanup, createEffect, untrack} from "solid-js";
 import {useDrag} from "@/utils/drag";
-import {WinState} from "./sys";
+import {WinState, ws} from "./sys";
 
 interface FrameWindowProps {
-    state: WinState;
+    winId: number;
     children: JSX.Element;
+    customCss?: string[];
 }
 
 // export const FrameWindow: Component<FrameWindowProps> = ({state, children}) => {
@@ -13,69 +14,85 @@ interface FrameWindowProps {
 // }
 
 
-export const FrameWindow: Component<FrameWindowProps> = ({state, children}) => {
+export const FrameWindow: Component<FrameWindowProps> = (props) => {
     const [windowRef, setWindowRef] = createSignal<HTMLElement>();
     const [titlebarRef, setTitlebarRef] = createSignal<HTMLElement>();
 
     onMount(() => {
-        windowRef()!.addEventListener('clickTaskIcon', props.store.onClickTaskIcon);
-        windowRef()!.addEventListener('dblclick', props.store.onDBClick);
+        const win = ws.wins[ws.idMap.get(props.winId)!];
+        
+        const handleMinimize = () => {
+            ws.unmappingWindow(props.winId);
+        };
+
+        const handleMaximize = () => {
+            // TODO: Get display dimensions from context
+            ws.configureWindow(props.winId, {
+                x: 0,
+                y: 0,
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        };
+
+        const handleClose = () => {
+            ws.destroyWindow(props.winId);
+        };
+
+        windowRef()!.addEventListener('minimize', handleMinimize);
+        windowRef()!.addEventListener('maximize', handleMaximize);
+        windowRef()!.addEventListener('close', handleClose);
 
         onCleanup(() => {
-            windowRef()!.removeEventListener('clickTaskIcon', props.store.onClickTaskIcon);
-            windowRef()!.removeEventListener('dblclick', props.store.onDBClick);
+            windowRef()!.removeEventListener('minimize', handleMinimize);
+            windowRef()!.removeEventListener('maximize', handleMaximize);
+            windowRef()!.removeEventListener('close', handleClose);
         });
 
-        const [lastPos, setLastPos] = createSignal({x: 0, y: 0});
+        const [lastPos, setLastPos] = createSignal({x: win.x, y: win.y});
         const {isDragging} = useDrag(titlebarRef()!, (dx, dy) => {
             const {x: startX, y: startY} = lastPos();
-            const {x: newX, y: newY} = rePos(
-                props.store,
-                startX + dx,
-                startY + dy
-            );
-            props.store.setPos(newX, newY);
-        }, {
-            allowDrag: () => props.store.status === 'normal'
+            // TODO: Add bounds checking
+            ws.configureWindow(props.winId, {
+                x: startX + dx,
+                y: startY + dy
+            });
         });
 
         createEffect(() => {
             if(isDragging()) {
-                setLastPos(untrack(() => ({x: props.store.x, y: props.store.y})));
+                const win = ws.wins[ws.idMap.get(props.winId)!];
+                setLastPos(untrack(() => ({x: win.x, y: win.y})));
             }
         });
     });
+
+    const win = () => ws.wins[ws.idMap.get(props.winId)!];
 
     return (
         <div
             ref={setWindowRef}
             class="window frame-window"
             style={{
-                transform: `translate3d(${props.store.x}px, ${props.store.y}px, 0)`,
-                width: `${props.store.width}px`,
-                height: `${props.store.height}px`,
-                "z-index": props.store.z,
-                "pointer-events": props.store.status === 'minimized' ? 'none' : 'auto',
-                visibility: props.store.status === 'minimized' ? 'hidden' : 'visible'
+                transform: `translate3d(${win().x}px, ${win().y}px, 0)`,
+                width: `${win().width}px`,
+                height: `${win().height}px`,
+                visibility: win().mapped ? 'visible' : 'hidden'
             }}
-            id={props.store.id}
         >
             <div
                 class="titlebar"
                 ref={setTitlebarRef}
             >
                 <div class="windowcontrols left">
-                    <button
-                        class="window-icon"
-                        style={{"--window-icon": `url(${props.store.icon})`}}
-                    />
+                    <button class="window-icon"/>
                     <button class="pin"/>
                 </div>
-                <div><label>{props.store.title}</label></div>
+                <div><label>Window {props.winId}</label></div>
                 <div class="windowcontrols right">
-                    <button class="minimize" onClick={() => props.store.minimize()}/>
-                    <button class="maximize" onClick={() => props.store.maximize()}/>
-                    <button class="close" onClick={() => props.store.close()}/>
+                    <button class="minimize" onClick={() => windowRef()!.dispatchEvent(new Event('minimize'))}/>
+                    <button class="maximize" onClick={() => windowRef()!.dispatchEvent(new Event('maximize'))}/>
+                    <button class="close" onClick={() => windowRef()!.dispatchEvent(new Event('close'))}/>
                 </div>
             </div>
             <div class={['content', ...(props.customCss || [])].join(' ')}>

@@ -1,8 +1,10 @@
 import {Workspace} from "@/workspace";
 import {createSignal, onCleanup, ParentComponent, Suspense} from "solid-js";
 import {Settings} from "@/app/settings";
-import {createContext} from "solid-js";
+import {createContext, For} from "solid-js";
 import {createStore} from "solid-js/store";
+import {FrameWindow} from "@/window-system/frame-window";
+import {ws} from "@/window-system/sys";
 
 export interface DisplayStore {
 	width: number;
@@ -61,7 +63,7 @@ export const Display = () => {
 			</Suspense>
 			<For each={ws.wins}>
 				{(win) => (
-					<FrameWindow state={win} >
+					<FrameWindow winId={win.id} >
 						<div>test</div>
 					</FrameWindow>
 				)}

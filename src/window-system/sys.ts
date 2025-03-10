@@ -3,7 +3,7 @@ import {onMount} from "solid-js";
 
 const DEFAULT_DISPLAY = 0;
 
-enum StackMode {
+export enum StackMode {
     Above,
     Below,
     TopIf,
@@ -35,13 +35,13 @@ interface createWindowProps {
 }
 
 interface WindowChanges {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    borderWidth: number;
-    siblingId: number;
-    stackMode: StackMode;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    borderWidth?: number;
+    siblingId?: number | null;
+    stackMode?: StackMode;
 }
 
 interface WinSys {
