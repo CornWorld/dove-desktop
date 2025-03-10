@@ -20,6 +20,9 @@ importers:
       parser:8.21.0:
         specifier: link:@typescript-eslint/parser:8.21.0
         version: link:@typescript-eslint/parser:8.21.0
+      solid-element:
+        specifier: ^1.9.1
+        version: 1.9.1(solid-js@1.9.4)
       solid-js:
         specifier: ^1.9.4
         version: 1.9.4
@@ -784,6 +787,9 @@ packages:
   colorjs.io@0.5.2:
     resolution: {integrity: sha512-twmVoizEW7ylZSN32OgKdXRmo1qg+wT5/6C3xu5b9QsWzSFAhHLn2xd8ro0diCsKfCj1RdaTP/nrcW+vAoQPIw==}
 
+  component-register@0.8.7:
+    resolution: {integrity: sha512-clPS/o1RNfJw7L1/w4q+nkj6l7JV32kFHCx6vW5nSPOEly4B9olMeADNilEgpLV/DdeS7y8JXhHKx9YvSj8vqQ==}
+
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
@@ -1373,6 +1379,11 @@ packages:
   shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
+
+  solid-element@1.9.1:
+    resolution: {integrity: sha512-baJy6Qz27oAUgkPlqOf3Y+7RsBiuVQrS51Nrh1ddDbrqrNPvJbIvehpUsTzLNFb2ZHIoHuNnDg330go/ZKcRdg==}
+    peerDependencies:
+      solid-js: ^1.9.3
 
   solid-js@1.9.4:
     resolution: {integrity: sha512-ipQl8FJ31bFUoBNScDQTG3BjN6+9Rg+Q+f10bUbnO6EOTTf5NGerJeHc7wyu5I4RMHEl/WwZwUmy/PTRgxxZ8g==}
@@ -2246,6 +2257,8 @@ snapshots:
 
   colorjs.io@0.5.2: {}
 
+  component-register@0.8.7: {}
+
   concat-map@0.0.1: {}
 
   convert-source-map@1.9.0: {}
@@ -2799,6 +2812,11 @@ snapshots:
       shebang-regex: 3.0.0
 
   shebang-regex@3.0.0: {}
+
+  solid-element@1.9.1(solid-js@1.9.4):
+    dependencies:
+      component-register: 0.8.7
+      solid-js: 1.9.4
 
   solid-js@1.9.4:
     dependencies:

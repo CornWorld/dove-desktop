@@ -2,8 +2,9 @@ import {Headerbar} from "@/component/headerbar";
 import {createSidebarNode, Sidebar, SidebarSelection} from "@/component/sidebar";
 import {createSignal} from "solid-js";
 import './settings.scss';
-import {createWindowStore, Window} from "@/component/window";
+import {createWindowStore, FrameWindow} from "@/component/window";
 import {QuickSettings} from "./quick-settings";
+// import {customElement, noShadowDOM} from "solid-element";
 
 export const Settings = () => {
 	const [headerbarWidth, setHeaderbarWidth] = createSignal(270);
@@ -85,11 +86,10 @@ export const Settings = () => {
 			]
 		},
 	];
-
+	
 	return (
-		<Window
+		<FrameWindow
 			store={windowState}
-			customCss={['quick-settings']}
 		>
 			<Headerbar ref={(el) => {
 				if(el?.getLeftWidth) {
@@ -111,7 +111,12 @@ export const Settings = () => {
 					<QuickSettings/>
 				</div>
 			</div>
-		</Window>
+		</FrameWindow>
 	);
 };
 
+
+// customElement('settings-app', {}, (props, { element }) => {
+// 	noShadowDOM();
+// 	return <Settings/>
+// });

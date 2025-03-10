@@ -54,12 +54,18 @@ export const Display = () => {
 				background: displayStore.backgroundImage ? `url(${displayStore.backgroundImage})` : displayStore.backgroundColor,
 			border: '0.1px solid black',
 			perspective: '1000px',
-		}} id="display" ref={displayStore.setRef}>
+		}} id="display0" ref={displayStore.setRef}>
 			<Suspense fallback={<></>}>
 				{/* TODO Loading screen*/}
 				<Workspace/>
-				<Settings/>
 			</Suspense>
+			<For each={ws.wins}>
+				{(win) => (
+					<FrameWindow state={win} >
+						<div>test</div>
+					</FrameWindow>
+				)}
+			</For>
 		</div>
 		</DisplayContext.Provider>
 	);

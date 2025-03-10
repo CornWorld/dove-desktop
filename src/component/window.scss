@@ -1,4 +1,4 @@
-.window, dialog {
+.window.frame-window {
   @mixin button-no-decoration {
     border: {
       color: transparent;

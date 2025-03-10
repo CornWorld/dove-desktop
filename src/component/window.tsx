@@ -143,12 +143,12 @@ export const createWindowStore = (initialState: WindowState) => {
 };
 
 interface WindowProps {
-	store: ReturnType<typeof createWindowStore>[0];
+	store: WindowStore;
 	customCss?: string[];
 	children: JSX.Element;
 }
 
-export const Window: Component<WindowProps> = (props) => {
+export const FrameWindow: Component<WindowProps> = (props) => {
 	const [windowRef, setWindowRef] = createSignal<HTMLElement>();
 	const [titlebarRef, setTitlebarRef] = createSignal<HTMLElement>();
 
@@ -187,7 +187,7 @@ export const Window: Component<WindowProps> = (props) => {
 	return (
 		<div
 			ref={setWindowRef}
-			class="window"
+			class="window frame-window"
 			style={{
 				transform: `translate3d(${props.store.x}px, ${props.store.y}px, 0)`,
 				width: `${props.store.width}px`,
