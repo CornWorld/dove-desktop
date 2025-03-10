@@ -2,8 +2,9 @@ import {Headerbar} from "@/component/headerbar";
 import {createSidebarNode, Sidebar, SidebarSelection} from "@/component/sidebar";
 import {createSignal} from "solid-js";
 import './settings.scss';
-import {createWindowStore, Window} from "@/component/window";
+import {createWindowStore, FrameWindow} from "@/component/window";
 import {QuickSettings} from "./quick-settings";
+// import {customElement, noShadowDOM} from "solid-element";
 
 const [windowState] = createWindowStore({
 	title: 'Window 1',
@@ -16,8 +17,7 @@ const [windowState] = createWindowStore({
 	x: 80,
 	y: 35,
 	z: 3,
-	// status: 'normal',
-	status: 'minimized',
+	status: 'normal',
 	originInfo: {
 		x: 80,
 		y: 45,
@@ -87,11 +87,10 @@ export const Settings = () => {
 			]
 		},
 	];
-
+	
 	return (
-		<Window
+		<FrameWindow
 			store={windowState}
-			customCss={['quick-settings']}
 		>
 			<Headerbar ref={(el) => {
 				if(el?.getLeftWidth) {
@@ -113,7 +112,12 @@ export const Settings = () => {
 					<QuickSettings/>
 				</div>
 			</div>
-		</Window>
+		</FrameWindow>
 	);
 };
 
+
+// customElement('settings-app', {}, (props, { element }) => {
+// 	noShadowDOM();
+// 	return <Settings/>
+// });

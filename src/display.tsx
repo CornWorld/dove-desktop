@@ -1,7 +1,10 @@
 import {Workspace} from "@/workspace";
-import {createSignal, onCleanup, Suspense} from "solid-js";
+import {createSignal, onCleanup, onMount, Suspense} from "solid-js";
 import {createStore} from "solid-js/store";
 import {Settings} from "@/app/settings";
+import {Dynamic, For} from "solid-js/web";
+import {ws} from "./window-system/sys";
+import {FrameWindow} from "./window-system/frame-window";
 
 interface DisplayState {
 	width: number;
@@ -13,9 +16,9 @@ interface DisplayState {
 }
 
 const [displayStore, setDisplayStore] = createStore<DisplayState>({
-	width: 1920,
-	height: 1080,
-	backgroundImage: '/wallpapers/light/1920x1080.png',
+	width: 1366,
+	height: 768,
+	backgroundImage: '/wallpapers/light/1366x768.png',
 
 	resize: (width, height) => {
 		setDisplayStore({width, height});
@@ -37,7 +40,7 @@ export const transPos = (x: number, y: number) => {
 }
 
 export const Display = () => {
-    let localRef: HTMLDivElement | null = null; // hack for HMR
+    let localRef: HTMLDivElement | null = null; 
 
     const setLocalRef = (element: HTMLDivElement) => {
         setRef(element);
@@ -60,12 +63,18 @@ export const Display = () => {
 			background: displayStore.backgroundImage ? `url(${displayStore.backgroundImage})` : displayStore.backgroundColor,
 			border: '0.1px solid black',
 			perspective: '1000px',
-		}} id="display" ref={setLocalRef}>
+		}} id="display0" ref={setLocalRef}>
 			<Suspense fallback={<></>}>
 				{/* TODO Loading screen*/}
 				<Workspace/>
-				<Settings/>
 			</Suspense>
+			<For each={ws.wins}>
+				{(win) => (
+					<FrameWindow state={win} >
+						<div>test</div>
+					</FrameWindow>
+				)}
+			</For>
 		</div>
 	);
 }
